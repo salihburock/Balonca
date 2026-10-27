@@ -11,5 +11,5 @@ const devWithoutCsp = (): Plugin => ({
 export default defineConfig({
   plugins: [svelte(), devWithoutCsp()],
   build: { target: 'es2022', sourcemap: false },
-  test: { environment: 'node', include: ['src/**/*.test.ts'] },
+  test: { environment: 'node', include: ['src/**/*.test.ts', 'server/**/*.test.mjs'] },
 });

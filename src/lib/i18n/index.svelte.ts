@@ -21,4 +21,7 @@ export function setLocale(l: Locale) {
   try { localStorage.setItem('balonca.locale', l); } catch {}
 }
 
-export const t = (key: MessageKey): string => LOCALES[i18n.locale][key] ?? tr[key];
+export const t = (key: MessageKey, params?: Record<string, string | number>): string => {
+  const msg = LOCALES[i18n.locale][key] ?? tr[key];
+  return params ? msg.replace(/\{(\w+)\}/g, (m, k) => (k in params ? String(params[k]) : m)) : msg;
+};

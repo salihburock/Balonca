@@ -1,8 +1,19 @@
 <script lang="ts">
   import Mascot from './Mascot.svelte';
-  import { t, i18n, setLocale } from '../lib/i18n/index.svelte';
+  import { onMount } from 'svelte';
+  import { t, i18n } from '../lib/i18n/index.svelte';
   import { router } from '../lib/router.svelte';
-  import { theme, cycleTheme } from '../lib/theme.svelte';
+  import { app } from '../lib/state.svelte';
+  import type { ThemeSetting } from '../lib/settings';
+
+  const NEXT: Record<ThemeSetting, ThemeSetting> = { auto: 'light', light: 'dark', dark: 'auto' };
+  let el: HTMLElement;
+  onMount(() => {
+    // The watch page sticks its video under the header, so publish the header's real height.
+    const ro = new ResizeObserver(() => document.documentElement.style.setProperty('--header-h', `${el.offsetHeight}px`));
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
 
   const links = [
     ['home', 'nav.home'],
@@ -13,7 +24,7 @@
   const themeIcon = { auto: '◐', light: '☀', dark: '☾' } as const;
 </script>
 
-<header>
+<header bind:this={el}>
   <a class="logo" href="#/" aria-label="Balonca"><Mascot size={34} /><span>Balonca</span></a>
   <nav aria-label="Main">
     {#each links as [route, key]}
@@ -21,11 +32,11 @@
     {/each}
   </nav>
   <div class="tools">
-    <button class="icon" onclick={() => setLocale(i18n.locale === 'tr' ? 'en' : 'tr')} aria-label={t('lang.switch')}>
+    <button class="icon" onclick={() => app.setSetting('locale', i18n.locale === 'tr' ? 'en' : 'tr')} aria-label={t('lang.switch')}>
       {i18n.locale.toUpperCase()}
     </button>
-    <button class="icon" onclick={cycleTheme} aria-label={t(`theme.${theme.value}`)} title={t(`theme.${theme.value}`)}>
-      <span aria-hidden="true">{themeIcon[theme.value]}</span>
+    <button class="icon" onclick={() => app.setSetting('theme', NEXT[app.settings.theme])} aria-label={t(`theme.${app.settings.theme}`)} title={t(`theme.${app.settings.theme}`)}>
+      <span aria-hidden="true">{themeIcon[app.settings.theme]}</span>
     </button>
   </div>
 </header>

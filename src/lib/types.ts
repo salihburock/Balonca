@@ -24,6 +24,7 @@ export interface SavedWord {
   w: string; // normalized word
   lang: string;
   ctx: string; // sentence it was saved from
+  trans: { lang: string; text: string }[]; // the same moment in the other visible tracks (translations)
   vid?: string;
   t: number; // seconds into the video
   added: number; // epoch ms

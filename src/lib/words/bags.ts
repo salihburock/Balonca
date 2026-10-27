@@ -3,10 +3,13 @@ import { normalizeWord } from './tokenize';
 
 export const wordId = (lang: string, w: string) => `${lang}:${w}`;
 
-export function makeWord(args: { lang: string; word: string; ctx: string; vid?: string; t: number; now?: number }): SavedWord {
+export function makeWord(args: {
+  lang: string; word: string; ctx: string; trans?: { lang: string; text: string }[]; vid?: string; t: number; now?: number;
+}): SavedWord {
   const w = normalizeWord(args.word, args.lang);
   return {
     id: wordId(args.lang, w), w, lang: args.lang, ctx: args.ctx.slice(0, 500),
+    trans: (args.trans ?? []).slice(0, 4).map((x) => ({ lang: x.lang, text: x.text.slice(0, 500) })),
     vid: args.vid, t: Math.max(0, Math.round(args.t)), added: args.now ?? Date.now(),
     reps: 0, ivl: 0, ease: 2.5, lapses: 0,
   };

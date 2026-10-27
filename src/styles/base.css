@@ -52,3 +52,6 @@ textarea { padding: var(--space-3); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* iPhone Safari cannot fullscreen arbitrary elements; the stage fakes it with a fixed layer. */
+body.pseudo-fs { overflow: hidden; }

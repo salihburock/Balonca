@@ -1,14 +1,23 @@
 export type Route = 'home' | 'watch' | 'words' | 'help' | 'notfound';
 const ROUTES: Route[] = ['home', 'watch', 'words', 'help'];
 
-function parse(): Route {
-  const seg = location.hash.replace(/^#\/?/, '').split(/[/?]/)[0] || 'home';
-  return (ROUTES as string[]).includes(seg) ? (seg as Route) : 'notfound';
+function parse() {
+  const raw = location.hash.replace(/^#\/?/, '');
+  const [path, query = ''] = raw.split('?');
+  const seg = path.split('/')[0] || 'home';
+  return {
+    route: ((ROUTES as string[]).includes(seg) ? seg : 'notfound') as Route,
+    params: new URLSearchParams(query),
+  };
 }
 
-export const router = $state({ route: parse() });
+export const router = $state(parse());
 
 addEventListener('hashchange', () => {
-  router.route = parse();
-  scrollTo(0, 0);
+  const next = parse();
+  if (next.route !== router.route) scrollTo(0, 0);
+  router.route = next.route;
+  router.params = next.params;
 });
+
+export const watchUrl = (id: string, t = 0) => `#/watch?v=${id}${t ? `&t=${Math.max(0, Math.floor(t))}` : ''}`;

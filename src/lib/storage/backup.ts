@@ -37,6 +37,9 @@ function cleanWord(x: any): SavedWord | null {
   if (!x || !isStr(x.w) || !isStr(x.lang) || !x.w || !x.lang) return null;
   return {
     id: `${x.lang}:${x.w}`, w: x.w, lang: x.lang, ctx: isStr(x.ctx) ? x.ctx : '',
+    trans: Array.isArray(x.trans)
+      ? x.trans.filter((r: any) => r && isStr(r.lang) && isStr(r.text)).slice(0, 4).map((r: any) => ({ lang: r.lang, text: r.text.slice(0, 500) }))
+      : [],
     vid: isStr(x.vid) ? x.vid : undefined, t: isNum(x.t) ? x.t : 0, added: isNum(x.added) ? x.added : Date.now(),
     reps: isNum(x.reps) ? x.reps : 0, ivl: isNum(x.ivl) ? x.ivl : 0, ease: isNum(x.ease) ? x.ease : 2.5,
     lapses: isNum(x.lapses) ? x.lapses : 0, due: isNum(x.due) ? x.due : undefined,

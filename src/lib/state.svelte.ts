@@ -82,6 +82,17 @@ class AppState {
     return { track, result: res };
   }
 
+  /** Adds an already-parsed track (e.g. the result of a translation). */
+  addCues(cues: StoredTrack['cues'], name: string, lang: string) {
+    const track: StoredTrack = {
+      id: uid(), vid: this.vid ?? '', name, lang, label: '',
+      color: TRACK_COLORS[this.tracks.length % TRACK_COLORS.length], visible: true, offset: 0, cues,
+    };
+    this.tracks.push(track);
+    this.persistTracks();
+    return track;
+  }
+
   updateTrack(id: string, patch: Partial<Pick<StoredTrack, 'label' | 'lang' | 'color' | 'visible' | 'offset'>>) {
     const t = this.tracks.find((x) => x.id === id);
     if (!t) return;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TranslatePanel from './TranslatePanel.svelte';
   import { app } from '../lib/state.svelte';
   import { ingestFiles, ingestText } from '../lib/ingest';
   import { t, i18n } from '../lib/i18n/index.svelte';
@@ -87,6 +88,8 @@
       <button class="primary" onclick={addPasted}>{t('tracks.paste.add')}</button>
     </div>
   </details>
+
+  <TranslatePanel />
 </div>
 
 <style>

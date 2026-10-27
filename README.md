@@ -22,6 +22,10 @@ Videos play through YouTube's official IFrame player only; nothing is downloaded
 Keyboard: `Space` play/pause · `←` `→` previous/next line · `R` repeat line · `F` fullscreen ·
 `W` word mode (then `←` `→` to move between words, `Enter` to save).
 
+## Quality
+Lighthouse (production build, mobile profile, local preview over HTTP): performance 92–98, accessibility 100,
+best practices 96–100, SEO 100. It is not a PWA (by design: no service worker or manifest).
+
 ## Setup
 Requires Node 20.19+.
 

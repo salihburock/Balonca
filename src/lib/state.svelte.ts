@@ -32,20 +32,18 @@ class AppState {
     if (this.db) void saveSettings(this.db, $state.snapshot(this.settings) as Settings);
   }, 300);
 
-  async init(): Promise<string | null> {
+  async init(): Promise<void> {
     try {
       this.db = await openBalonca();
       this.settings = await loadSettings(this.db);
       this.words = await loadWords(this.db);
       this.applySettings(false);
       const last = await getLastVideo(this.db);
-      this.ready = true;
-      return last;
+      if (last) await this.openVideo(last);
     } catch {
       this.storageOk = false;
-      this.ready = true;
-      return null;
     }
+    this.ready = true;
   }
 
   /** Mirrors theme/locale to the UI modules; `persist` is false while loading. */

@@ -3,6 +3,7 @@
   import { app } from '../lib/state.svelte';
   import { ingestFiles, ingestText } from '../lib/ingest';
   import { t, i18n } from '../lib/i18n/index.svelte';
+  import { toast } from '../lib/toast.svelte';
   import { langName } from '../lib/languages';
 
   let over = $state(false);
@@ -17,7 +18,7 @@
   }
   function addPasted() {
     if (!pasted.trim()) return;
-    if (!app.vid) { ingestText('', 'paste'); return; }
+    if (!app.vid) { toast(t('tracks.needVideo'), 'error'); return; }
     if (ingestText(pasted, pasteLang ? `paste.${pasteLang}.txt` : 'paste.txt', pasteLang.trim().toLowerCase() || undefined)) {
       pasted = '';
     }

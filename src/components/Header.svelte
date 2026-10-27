@@ -32,7 +32,7 @@
     {/each}
   </nav>
   <div class="tools">
-    <button class="icon" onclick={() => app.setSetting('locale', i18n.locale === 'tr' ? 'en' : 'tr')} aria-label={t('lang.switch')}>
+    <button class="icon" onclick={() => app.setSetting('locale', i18n.locale === 'tr' ? 'en' : 'tr')} aria-label="{i18n.locale.toUpperCase()} · {t('lang.switch')}">
       {i18n.locale.toUpperCase()}
     </button>
     <button class="icon" onclick={() => app.setSetting('theme', NEXT[app.settings.theme])} aria-label={t(`theme.${app.settings.theme}`)} title={t(`theme.${app.settings.theme}`)}>

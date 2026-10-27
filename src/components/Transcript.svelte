@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import VirtualList from './VirtualList.svelte';
   import WordRow from './WordRow.svelte';
   import Mascot from './Mascot.svelte';
@@ -18,7 +19,7 @@
 
   // Follow playback, but leave the reader alone for a few seconds after they scroll themselves.
   $effect(() => {
-    if (activeIdx >= 0 && app.settings.autoScroll && Date.now() - lastUserScroll > 4000) list?.scrollToIndex(activeIdx);
+    if (activeIdx >= 0 && app.settings.autoScroll && Date.now() - lastUserScroll > 4000) untrack(() => list?.scrollToIndex(activeIdx));
   });
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;

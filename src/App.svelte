@@ -2,31 +2,44 @@
   import Header from './components/Header.svelte';
   import Toasts from './components/Toasts.svelte';
   import Home from './routes/Home.svelte';
-  import Watch from './routes/Watch.svelte';
-  import Words from './routes/Words.svelte';
-  import Help from './routes/Help.svelte';
   import NotFound from './routes/NotFound.svelte';
   import { router } from './lib/router.svelte';
+  import { app } from './lib/state.svelte';
   import { t } from './lib/i18n/index.svelte';
+  import type { Component } from 'svelte';
 
-  const pages = { home: Home, words: Words, help: Help, notfound: NotFound } as const;
+  // Heavy pages are separate chunks, fetched only when first visited.
+  const lazy = {
+    watch: () => import('./routes/Watch.svelte'),
+    words: () => import('./routes/Words.svelte'),
+    help: () => import('./routes/Help.svelte'),
+  } as const;
+
+  const loaded = $state<Record<string, Component | undefined>>({});
+  $effect(() => {
+    const r = router.route;
+    if (r in lazy && !loaded[r]) void lazy[r as keyof typeof lazy]().then((m) => (loaded[r] = m.default as Component));
+  });
+
   // The player stays mounted once opened so leaving and returning never reloads the video.
   let watchOpened = $state(router.route === 'watch');
   $effect(() => { if (router.route === 'watch') watchOpened = true; });
-
-  const Page = $derived(router.route === 'watch' ? null : pages[router.route]);
+  const Watch = $derived(loaded.watch);
+  const Page = $derived(router.route === 'home' ? Home : router.route === 'notfound' ? NotFound : router.route === 'watch' ? null : loaded[router.route]);
 </script>
 
 <a class="skip" href="#main" onclick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>{t('skip')}</a>
 <Header />
 <main id="main" tabindex="-1">
-  {#if watchOpened}
-    <div class="page" hidden={router.route !== 'watch'}><Watch /></div>
-  {/if}
-  {#if Page}
-    {#key router.route}
-      <div class="page"><Page /></div>
-    {/key}
+  {#if app.ready}
+    {#if watchOpened && Watch}
+      <div class="page" hidden={router.route !== 'watch'}><Watch /></div>
+    {/if}
+    {#if Page}
+      {#key router.route}
+        <div class="page"><Page /></div>
+      {/key}
+    {/if}
   {/if}
 </main>
 <footer><small class="muted">{t('footer.note')}</small></footer>

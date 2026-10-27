@@ -52,6 +52,7 @@ export async function createPlayer(
   const YT = await loadYouTubeApi();
   return new YT.Player(host, {
     width: '100%', height: '100%',
+    host: 'https://www.youtube-nocookie.com', // privacy-enhanced mode: no cookies until playback
     playerVars: { controls: 0, fs: 0, rel: 0, playsinline: 1, disablekb: 1, iv_load_policy: 3, cc_load_policy: 0, origin: location.origin },
     events: {
       onReady: () => handlers.onReady(),

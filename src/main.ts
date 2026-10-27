@@ -12,8 +12,6 @@ import { app } from './lib/state.svelte';
 applyTheme(); // best guess from localStorage until IndexedDB settings load
 document.documentElement.lang = i18n.locale;
 
-// Load saved data first so the first paint already has the right theme, language and last video.
-app.init().then(async (last) => {
-  if (last) await app.openVideo(last);
-  mount(App, { target: document.getElementById('app')! });
-});
+// Paint right away; pages render once saved data has loaded (see App.svelte).
+void app.init();
+mount(App, { target: document.getElementById('app')! });

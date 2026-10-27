@@ -66,6 +66,29 @@ Drop the resulting `.json3` onto the **Subtitles** tab.
    It downloads the captions, translates them in batches of 25 and writes `subs.json`
    (`[{start,end,text}]`), which you then load into the app like any other subtitle file.
 
+## Subtitle service (yt-dlp)
+The only server-side piece, and optional: `server/` is a ~200-line zero-dependency Node service that runs
+`yt-dlp` so the **Subtitles → Fetch subtitles from YouTube** panel can list every subtitle a video has
+(manual, original auto-captions, and YouTube's auto-translations) with the language code and its full
+Turkish/English name, filterable, and add one with a click. Without the service the rest of the app works
+unchanged and the panel explains how to add a file instead. Set `VITE_SUBS_API=off` at build time to hide it.
+
+```bash
+npm run api                    # http://127.0.0.1:8787, needs yt-dlp on PATH (or YTDLP_BIN=/path/to/yt-dlp)
+npm run dev                    # the dev server proxies /api to it
+```
+
+Endpoints: `GET /api/subs?v=ID` (list), `GET /api/sub?v=ID&lang=CODE&kind=auto|manual` (download),
+`GET /api/health`. Only YouTube video ids and plain language codes are accepted, `yt-dlp` is started without a
+shell, at most 2 run at once, results are cached for 10 minutes, and each client is limited to 30 requests per minute.
+Environment: `PORT`, `HOST`, `YTDLP_BIN`, `TRUST_PROXY=1` (behind nginx), `RATE_PER_MINUTE`, `ALLOWED_ORIGINS`.
+
+Things to know:
+- YouTube answers **HTTP 429 for its machine-translated captions** when asked by scripts, so those often fail while the
+  original track (`nl-orig`) works. The app says so and suggests the translation helper instead.
+- Servers in data centres are sometimes asked to "sign in to confirm you're not a bot". The app reports that too.
+- Keep `yt-dlp` current (`yt-dlp -U`); YouTube changes break old versions.
+
 ## Data and backups
 Words, settings and subtitles live in IndexedDB (database `balonca`). Use **My words → Backup** to export one
 JSON file and import it on another device (merge or replace). Data from the earlier single-file prototype
@@ -79,10 +102,12 @@ src/lib/srs/         spaced-repetition scheduler                  (unit-tested)
 src/lib/storage/     IndexedDB, backup/restore, legacy migration  (unit-tested)
 src/lib/player/      YouTube wrapper, cue lookup/alignment, controller
 src/lib/translate/   Anthropic client + batch runner (isolated)   (unit-tested)
+src/lib/ytsubs/      client + language filter for the subtitle service (unit-tested)
+server/              yt-dlp subtitle service (Node, no dependencies)  (unit-tested)
 src/lib/i18n/        tr.ts is the source, en.ts must cover every key
 src/components/      UI pieces      src/routes/   pages
 legacy/              the original single-file prototypes (reference only)
-deploy/              nginx server block
+deploy/              nginx server block, PM2 config for the service
 ```
 
 ## Deploy
@@ -97,6 +122,12 @@ sudo cp deploy/nginx-balonca.conf /etc/nginx/sites-available/balonca
 sudo ln -s /etc/nginx/sites-available/balonca /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d balonca.example.com
+```
+Subtitle service on the same server (no root needed):
+```bash
+ssh user@your-server 'mkdir -p ~/.local/bin ~/balonca-api && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp && chmod +x ~/.local/bin/yt-dlp'
+rsync -av server/ user@your-server:~/balonca-api/server/ && scp deploy/ecosystem.config.cjs user@your-server:~/balonca-api/
+ssh user@your-server 'cd ~/balonca-api && pm2 start ecosystem.config.cjs && pm2 save'
 ```
 DNS: an `A` record for `balonca.example.com` → the server's IP. Use HTTPS in production: some browser
 features (and YouTube embedding behaviour) are more reliable on a secure origin.

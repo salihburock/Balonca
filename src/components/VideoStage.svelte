@@ -120,7 +120,7 @@
   .controls { display: grid; gap: var(--space-2); }
   .seek { display: flex; align-items: center; gap: var(--space-2); }
   .seek input { flex: 1; min-width: 0; accent-color: var(--accent); min-height: 32px; }
-  .time { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); min-width: 3.2rem; text-align: center; }
+  .time { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); min-width: 3.2rem; text-align: center; }
   .buttons { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
   .buttons button { min-width: 44px; padding: 0 12px; }
   .play { min-width: 56px !important; }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import TranslatePanel from './TranslatePanel.svelte';
+  import YtSubsPanel from './YtSubsPanel.svelte';
   import { app } from '../lib/state.svelte';
   import { ingestFiles, ingestText } from '../lib/ingest';
   import { t, i18n } from '../lib/i18n/index.svelte';
@@ -28,6 +29,8 @@
 </script>
 
 <div class="panel">
+  <YtSubsPanel />
+
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="drop"

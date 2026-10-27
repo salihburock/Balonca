@@ -31,9 +31,27 @@ export const LANGUAGES: Record<string, LangInfo> = {
   id: { tr: 'Endonezce', en: 'Indonesian', aliases: ['indonesian'] },
 };
 
-export function langName(code: string, locale: 'tr' | 'en'): string {
-  return LANGUAGES[code]?.[locale] ?? code;
+const displayNames = new Map<string, Intl.DisplayNames | null>();
+
+/**
+ * Full language name in the UI language for any code: "nl" -> Felemenkçe / Dutch, "zh-Hans" -> Basitleştirilmiş Çince.
+ * YouTube's "-orig" suffix (original auto-caption track) is ignored. Unknown codes come back unchanged.
+ */
+export function displayLanguage(code: string, locale: 'tr' | 'en'): string {
+  const clean = code.replace(/-orig$/i, '');
+  if (!displayNames.has(locale)) {
+    let dn: Intl.DisplayNames | null = null;
+    try { dn = new Intl.DisplayNames([locale], { type: 'language' }); } catch {}
+    displayNames.set(locale, dn);
+  }
+  try {
+    const name = displayNames.get(locale)?.of(clean);
+    if (name && name !== 'root' && name.toLowerCase() !== clean.toLowerCase()) return name; // 'root' = private-use tag
+  } catch {} // invalid tags such as "??" or "x-custom"
+  return LANGUAGES[clean.split('-')[0].toLowerCase()]?.[locale] ?? clean;
 }
+
+export const langName = displayLanguage;
 
 const SUB_EXT = /\.(srt|vtt|json3|json|txt|sbv|ass)$/i;
 const ALIAS_TO_CODE = new Map<string, string>(

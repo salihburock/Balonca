@@ -7,6 +7,7 @@
   import { player } from '../lib/player/controller.svelte';
   import { alignTracks } from '../lib/player/cues';
   import { t } from '../lib/i18n/index.svelte';
+  import { EXAMPLE_VIDEO_ID } from '../lib/example';
 
   const primary = $derived(app.visibleTracks[0]);
   const others = $derived(app.visibleTracks.slice(1));
@@ -43,7 +44,7 @@
 {#if !primary}
   <div class="empty">
     <Mascot size={64} />
-    <p class="muted">{t('transcript.empty')}</p>
+    <p class="muted">{app.vid === EXAMPLE_VIDEO_ID ? t('transcript.example') : t('transcript.empty')}</p>
   </div>
 {:else}
   <VirtualList
@@ -86,7 +87,7 @@
   .line:hover { background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
   .line.on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
   .time {
-    all: unset; flex: none; min-width: 42px; padding-top: 3px; text-align: right; cursor: pointer;
+    all: unset; font-family: var(--font-display); flex: none; min-width: 42px; padding-top: 3px; text-align: right; cursor: pointer;
     font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums;
   }
   .time:hover { color: var(--accent); }

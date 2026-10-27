@@ -7,6 +7,7 @@ import { detectLangFromFilename } from './languages';
 import { makeWord, toggleWord, wordId } from './words/bags';
 import { schedule, type Grade } from './srs/scheduler';
 import { setLocale } from './i18n/index.svelte';
+import { EXAMPLE_VIDEO_ID, EXAMPLE_SUBTITLE } from './example';
 import { theme, applyTheme } from './theme.svelte';
 
 const debounce = <A extends unknown[]>(fn: (...a: A) => void, ms: number) => {
@@ -65,6 +66,23 @@ class AppState {
     this.vid = id;
     this.tracks = this.db ? await loadTracks(this.db, id) : [];
     if (this.db) await setLastVideo(this.db, id);
+  }
+
+  /**
+   * Gives the example video its bundled Dutch subtitle, once per browser: if the user later removes it,
+   * it stays removed. Silent on failure (offline, blocked): the example just opens without subtitles.
+   */
+  async seedExample() {
+    if (this.vid !== EXAMPLE_VIDEO_ID || this.tracks.length) return;
+    if (this.db && (await this.db.get('meta', 'exampleSeeded'))) return;
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}examples/${EXAMPLE_SUBTITLE.file}`);
+      if (!res.ok) return;
+      const text = await res.text();
+      if (this.vid !== EXAMPLE_VIDEO_ID || this.tracks.length) return; // the user got ahead of us
+      this.addTrack(text, EXAMPLE_SUBTITLE.file, EXAMPLE_SUBTITLE.lang);
+      if (this.db) await this.db.put('meta', true, 'exampleSeeded');
+    } catch {}
   }
 
   /** Parses subtitle text into a new track. Throws SubtitleParseError on bad input. */

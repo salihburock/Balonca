@@ -115,7 +115,7 @@ export const en: Record<MessageKey, string> = {
   'ytsubs.err.unreachable': 'The subtitle service is not reachable. It may be switched off in this version; you can download the subtitle with yt-dlp and add it as a file (see Help).',
   'ytsubs.err.failed': 'The subtitle could not be retrieved. Try again.',
   'ytsubs.err.cancelled': 'Cancelled.',
-  'transcript.example': 'This is an example video: a Flemish cartoon with only auto-generated Dutch captions. In the Subtitles tab use “Fetch subtitles from YouTube” to add the original captions and a Turkish translation.',
+  'transcript.example': 'This is an example video: a Flemish cartoon. Its auto-generated Dutch captions normally load by themselves; if you removed them, add them again from the Subtitles tab with “Fetch subtitles from YouTube”.',
 
   'translate.title': 'Translation helper (optional)',
   'translate.desc': 'Translate a loaded subtitle into another language with Claude. Text goes straight from your browser to Anthropic; Balonca has no server.',

@@ -113,7 +113,7 @@ export const tr = {
   'ytsubs.err.unreachable': 'Altyazı servisine ulaşılamıyor. Bu sürümde servis kapalı olabilir; altyazıyı yt-dlp ile indirip dosya olarak ekleyebilirsin (Yardım sayfası).',
   'ytsubs.err.failed': 'Altyazı alınamadı. Tekrar dene.',
   'ytsubs.err.cancelled': 'İptal edildi.',
-  'transcript.example': 'Bu bir örnek video: Flamanca çizgi film, yalnızca otomatik Flamanca altyazısı var. Altyazılar sekmesinden “YouTube’dan altyazı getir” ile özgün altyazıyı ve Türkçe çeviriyi ekle.',
+  'transcript.example': 'Bu bir örnek video: Flamanca bir çizgi film. Flamanca otomatik altyazısı normalde kendiliğinden yüklenir; sildiysen Altyazılar sekmesinden “YouTube’dan altyazı getir” ile tekrar ekleyebilirsin.',
 
   'translate.title': 'Çeviri yardımcısı (isteğe bağlı)',
   'translate.desc': 'Yüklü bir altyazıyı Claude ile başka bir dile çevir. Metin tarayıcından doğrudan Anthropic’e gider; Balonca’nın sunucusu yoktur.',

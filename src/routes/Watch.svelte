@@ -42,6 +42,7 @@
     untrack(async () => {
       await app.openVideo(v);
       url = `https://youtu.be/${v}`;
+      if (v === EXAMPLE_VIDEO_ID) void app.seedExample();
       if (player.loaded !== v) player.load(v, at);
       else if (at) player.seek(at);
     });

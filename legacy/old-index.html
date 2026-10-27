@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çok Dilli Altyazı Oynatıcı</title>
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--tx:#1d1d1f;--mut:#6e6e73;--ln:#e2e2e7;--ac:#4f46e5;--hl:#e0e7ff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e0e11;--card:#18181c;--tx:#ececf1;--mut:#9a9aa5;--ln:#2a2a31;--ac:#818cf8;--hl:#2b2d55;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0e0e11;--card:#18181c;--tx:#ececf1;--mut:#9a9aa5;--ln:#2a2a31;--ac:#818cf8;--hl:#2b2d55;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,sans-serif}
+header{display:flex;gap:8px;padding:10px 12px;align-items:center;position:sticky;top:0;background:var(--bg);z-index:20;border-bottom:1px solid var(--ln)}
+header h1{font-size:16px;margin:0;white-space:nowrap}
+input,select,button{font:inherit;color:var(--tx)}
+input[type=text],input:not([type]),select{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:8px 10px}
+#url{flex:1;min-width:0}
+button{background:var(--card);border:1px solid var(--ln);border-radius:8px;padding:8px 12px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:12px;padding:12px;max-width:1400px;margin:0 auto}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:10px;margin-bottom:12px}
+#wrap{position:relative;background:#000;aspect-ratio:16/9;border-radius:12px;overflow:hidden}
+#wrap:fullscreen{aspect-ratio:auto;width:100vw;height:100vh;border-radius:0}
+#player,#player iframe{position:absolute;inset:0;width:100%;height:100%}
+#ov{position:absolute;left:3%;right:3%;bottom:9%;display:flex;flex-direction:column;gap:4px;align-items:center;pointer-events:none;z-index:5}
+.ovl{background:rgba(0,0,0,var(--bgo,.55));color:#fff;padding:3px 10px;border-radius:6px;text-align:center;font-size:var(--fs,26px);line-height:1.3;max-width:100%}
+.ovl i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.w{cursor:pointer;pointer-events:auto;border-radius:3px}
+.w:hover{background:var(--ac);color:#fff}
+.w.sv{text-decoration:underline dotted var(--ac);text-underline-offset:3px;font-weight:600}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.ctl label{font-size:13px;color:var(--mut);display:flex;gap:4px;align-items:center}
+.trk{display:flex;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--ln);flex-wrap:wrap}
+.trk:first-of-type{border-top:0}
+.trk .lang{width:100px}
+.trk input[type=color]{width:28px;height:28px;padding:0;border:0;background:none}
+.trk .nm{color:var(--mut);font-size:12px;flex:1;min-width:50px}
+.trk button{padding:4px 9px}
+#drop{border:2px dashed var(--ln);border-radius:10px;padding:14px;text-align:center;color:var(--mut);cursor:pointer;margin-top:8px}
+#drop.over{border-color:var(--ac);color:var(--ac)}
+.tabs{display:flex;gap:4px;margin-bottom:8px}
+.tabs button{flex:1}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pane{display:none}.pane.on{display:block}
+#tr,#bl{max-height:62vh;overflow-y:auto;position:relative}
+.ln{display:flex;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.ln.on{background:var(--hl)}
+.ln .tm{color:var(--mut);font-size:11px;min-width:38px;padding-top:3px}
+.oth{font-size:13px;margin-top:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chip{padding:4px 10px;border-radius:99px;font-size:13px}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.bw{display:flex;gap:6px;align-items:center;padding:8px 0;border-top:1px solid var(--ln)}
+.bw>div{flex:1;min-width:0}.ctx{font-size:12px;color:var(--mut)}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:14px}
+.row input[type=range]{flex:1}
+.mut{color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 Altyazı Oynatıcı</h1>
+  <input id="url" placeholder="YouTube linkini yapıştır">
+  <button class="p" id="go">Yükle</button>
+  <button id="th" title="Tema">🌓</button>
+</header>
+<div class="grid">
+<div>
+  <div id="wrap"><div id="player"></div><div id="ov"></div></div>
+  <div class="ctl">
+    <button id="prev" title="Önceki satır (←)">⏮</button>
+    <button id="pp" title="Oynat/duraklat (Boşluk)">⏯</button>
+    <button id="next" title="Sonraki satır (→)">⏭</button>
+    <select id="spd"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select>
+    <label><input type="checkbox" id="loop"> Satırı tekrarla (R)</label>
+    <button id="fs" style="margin-left:auto">⛶ Tam ekran (F)</button>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <b>Altyazı dosyaları</b> <span class="mut">(.srt .vtt .json3 .json)</span>
+    <div id="tracks"></div>
+    <div id="drop">Dosyaları sürükle veya tıkla (birden fazla seçebilirsin)</div>
+    <input type="file" id="file" multiple accept=".srt,.vtt,.json,.json3,.txt" hidden>
+    <div class="mut" id="note" style="margin-top:6px"></div>
+  </div>
+</div>
+<aside class="card">
+  <div class="tabs"><button class="on" data-p="tr">Transkript</button><button data-p="bl">Kelimelerim</button><button data-p="st">Ayarlar</button></div>
+  <div class="pane on" id="tr"></div>
+  <div class="pane" id="bl"></div>
+  <div class="pane" id="st">
+    <div class="row">Yazı boyutu <input type="range" id="fsz" min="14" max="48"></div>
+    <div class="row">Arka plan <input type="range" id="bgo" min="0" max="100"></div>
+    <div class="row"><label><input type="checkbox" id="pz"> Kelime kaydedince videoyu duraklat</label></div>
+    <div class="row"><label><input type="checkbox" id="as"> Transkripti otomatik kaydır</label></div>
+    <p class="mut">Kısayollar: Boşluk oynat/duraklat · ←/→ önceki/sonraki satır · R satırı tekrarla · F tam ekran.<br>Altyazıdaki kelimeye tıkla → o dilin kelime torbasına eklenir; tekrar tıkla → çıkar. Altyazılar ve kelimeler tarayıcında saklanır.</p>
+  </div>
+</aside>
+</div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const $=s=>document.querySelector(s);
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COL=['#ffd54a','#6ee7b7','#7dd3fc','#f9a8d4','#c4b5fd'];
+const NAMES={nl:'Felemenkçe',tr:'Türkçe',en:'İngilizce',de:'Almanca',fr:'Fransızca',es:'İspanyolca',it:'İtalyanca',ru:'Rusça',ja:'Japonca',ar:'Arapça'};
+let set=Object.assign({theme:'auto',size:26,bg:55,pause:true,scroll:true},ls.get('sv_set',{}));
+let bags=ls.get('sv_bags',{}),tracks=[],vid=null,player=null,ready=false,pending=null,bagLang=null,sig='',curIdx=-1,q='';
+const saveSet=()=>ls.set('sv_set',set),saveBags=()=>ls.set('sv_bags',bags);
+const saveTracks=()=>vid&&ls.set('sv_v_'+vid,tracks);
+
+/* ---------- tema & ayarlar ---------- */
+function applyTheme(){const r=document.documentElement;set.theme==='auto'?r.removeAttribute('data-theme'):r.dataset.theme=set.theme;$('#th').textContent={auto:'🌓',light:'☀️',dark:'🌙'}[set.theme]}
+function applySet(){const s=document.documentElement.style;s.setProperty('--fs',set.size+'px');s.setProperty('--bgo',set.bg/100);$('#fsz').value=set.size;$('#bgo').value=set.bg;$('#pz').checked=set.pause;$('#as').checked=set.scroll}
+$('#th').onclick=()=>{set.theme={auto:'light',light:'dark',dark:'auto'}[set.theme];applyTheme();saveSet()};
+$('#fsz').oninput=e=>{set.size=+e.target.value;applySet();saveSet()};
+$('#bgo').oninput=e=>{set.bg=+e.target.value;applySet();saveSet()};
+$('#pz').onchange=e=>{set.pause=e.target.checked;saveSet()};
+$('#as').onchange=e=>{set.scroll=e.target.checked;saveSet()};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button,.pane').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.p).classList.add('on');if(b.dataset.p==='bl')renderBags()});
+
+/* ---------- altyazı ayrıştırma ---------- */
+const ts=s=>{const m=s.trim().replace(',','.').split(':').map(parseFloat);return m.length==3?m[0]*3600+m[1]*60+m[2]:m[0]*60+m[1]};
+function parseText(txt){const out=[];for(const b of txt.replace(/\r/g,'').split(/\n\s*\n/)){const L=b.split('\n'),i=L.findIndex(l=>l.includes('-->'));if(i<0)continue;const[a,c]=L[i].split('-->');const text=L.slice(i+1).join(' ').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();if(text)out.push({start:ts(a),end:ts(c.trim().split(' ')[0]),text})}return out}
+function parseAny(txt){txt=txt.replace(/^\uFEFF/,'');const t=txt.trim();let L;
+ if(t[0]=='[')L=JSON.parse(t).map(x=>({start:+x.start,end:+x.end,text:String(x.text)}));
+ else if(t[0]=='{')L=(JSON.parse(t).events||[]).filter(e=>e.segs).map(e=>({start:e.tStartMs/1000,end:(e.tStartMs+(e.dDurationMs||2000))/1000,text:e.segs.map(s=>s.utf8||'').join('').replace(/\s+/g,' ').trim()})).filter(x=>x.text);
+ else L=parseText(t);
+ L.sort((a,b)=>a.start-b.start);const o=[];for(const l of L){const p=o[o.length-1];if(p&&p.text==l.text&&l.start<=p.end+.3)p.end=Math.max(p.end,l.end);else o.push(l)}return o}
+async function addFiles(files){for(const f of files){try{const lines=parseAny(await f.text());if(!lines.length)throw 0;
+ const m=f.name.match(/\.([a-z]{2,3}(?:-[A-Za-z]+)?)(?:-[^.]*)?\.(srt|vtt|json3|json|txt)$/i);const code=m&&m[1].split('-')[0].toLowerCase();
+ tracks.push({id:Date.now()+Math.random(),name:f.name,lang:code?(NAMES[code]||code):f.name.replace(/\.[^.]+$/,''),color:COL[tracks.length%COL.length],visible:true,offset:0,lines})}
+ catch{$('#note').textContent='Okunamadı: '+f.name}}
+ changed()}
+function changed(){saveTracks();renderTracks();renderTranscript();sig='';curIdx=-1}
+$('#drop').onclick=()=>$('#file').click();
+$('#file').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+['dragover','dragenter'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.add('over')}));
+['dragleave','drop'].forEach(ev=>$('#drop').addEventListener(ev,e=>{e.preventDefault();$('#drop').classList.remove('over')}));
+$('#drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+
+/* ---------- kelime işleme ---------- */
+const norm=w=>w.toLocaleLowerCase();
+const isSaved=(w,l)=>(bags[l]||[]).some(x=>x.w===w);
+function words(text,lang){return text.replace(/[\p{L}\p{N}][\p{L}\p{N}'’-]*|[^\p{L}\p{N}]+/gu,m=>/^[\p{L}\p{N}]/u.test(m)?`<span class="w${isSaved(norm(m),lang)?' sv':''}" data-w="${esc(norm(m))}" data-l="${esc(lang)}">${esc(m)}</span>`:esc(m))}
+document.addEventListener('click',e=>{const el=e.target.closest('.w');if(!el)return;e.stopPropagation();
+ const w=el.dataset.w,l=el.dataset.l,arr=bags[l]||(bags[l]=[]),i=arr.findIndex(x=>x.w===w);
+ if(i>=0)arr.splice(i,1);else{arr.push({w,ctx:el.closest('[data-ctx]')?.dataset.ctx||'',vid,t:Math.round(now())});if(set.pause&&ready)player.pauseVideo()}
+ if(!arr.length)delete bags[l];saveBags();
+ document.querySelectorAll('.w').forEach(x=>{if(x.dataset.w===w&&x.dataset.l===l)x.classList.toggle('sv',isSaved(w,l))});
+ if($('#bl').classList.contains('on'))renderBags()},true);
+
+/* ---------- görünüm ---------- */
+const fmt=s=>{s=Math.max(0,s|0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function renderTracks(){$('#tracks').innerHTML=tracks.map(t=>`<div class="trk" data-id="${t.id}"><input type="checkbox" data-a="vis" ${t.visible?'checked':''}><input type="color" data-a="col" value="${t.color}"><input class="lang" data-a="lang" value="${esc(t.lang)}" title="Dil adı (kelime torbası bu isme göre ayrılır)"><span class="nm" title="${esc(t.name)}">${t.lines.length} satır</span><span><button data-a="m">−</button> <b>${t.offset.toFixed(1)}s</b> <button data-a="p">+</button></span><button data-a="del">✕</button></div>`).join('');
+ $('#note').textContent=location.protocol==='file:'?'Not: YouTube oynatıcısı için siteyi dosya olarak değil bir sunucudan aç (python -m http.server).':(tracks.length?'−/+ ile altyazı gecikmesini ayarla.':'')}
+function tr(e){const row=e.target.closest('.trk');return row&&tracks.find(t=>t.id==row.dataset.id)}
+$('#tracks').addEventListener('click',e=>{const t=tr(e),a=e.target.dataset.a;if(!t)return;
+ if(a==='del')tracks=tracks.filter(x=>x!==t);else if(a==='m')t.offset-=.2;else if(a==='p')t.offset+=.2;else return;changed()});
+$('#tracks').addEventListener('change',e=>{const t=tr(e),a=e.target.dataset.a;if(!t)return;
+ if(a==='vis')t.visible=e.target.checked;else if(a==='col')t.color=e.target.value;else if(a==='lang')t.lang=e.target.value.trim()||t.lang;changed()});
+const primary=()=>tracks.find(t=>t.visible);
+function renderTranscript(){const p=primary();if(!p){$('#tr').innerHTML='<p class="mut">Henüz görünür altyazı yok. Bir dosya yükle.</p>';return}
+ const others=tracks.filter(t=>t.visible&&t!==p);
+ $('#tr').innerHTML=p.lines.map((l,i)=>{const mid=(l.start+l.end)/2+p.offset;
+  const oh=others.map(o=>{const x=o.lines.find(z=>mid>=z.start+o.offset&&mid<=z.end+o.offset);return x?`<div class="oth" style="color:${o.color}" data-ctx="${esc(x.text)}">${words(x.text,o.lang)}</div>`:''}).join('');
+  return `<div class="ln" data-i="${i}" data-ctx="${esc(l.text)}"><span class="tm">${fmt(l.start)}</span><div>${words(l.text,p.lang)}${oh}</div></div>`}).join('')}
+$('#tr').addEventListener('click',e=>{const ln=e.target.closest('.ln');if(!ln||!ready)return;const p=primary();player.seekTo(p.lines[ln.dataset.i].start+p.offset,true)});
+function renderBags(){const langs=Object.keys(bags);if(!langs.length){$('#bl').innerHTML='<p class="mut">Torba boş. Altyazıdaki bir kelimeye tıkla.</p>';return}
+ if(!langs.includes(bagLang))bagLang=langs[0];
+ const items=bags[bagLang].filter(x=>!q||(x.w+x.ctx).toLowerCase().includes(q));
+ $('#bl').innerHTML=`<div class="chips">${langs.map(l=>`<button class="chip${l===bagLang?' on':''}" data-l="${esc(l)}">${esc(l)} (${bags[l].length})</button>`).join('')}</div>
+ <div class="row"><input id="q" placeholder="Ara…" value="${esc(q)}" style="flex:1"><button data-x="csv">CSV</button><button data-x="clr">Torbayı boşalt</button></div>`+
+ items.map(x=>`<div class="bw"><div><b>${esc(x.w)}</b><div class="ctx">${esc(x.ctx)}</div></div>${x.vid?`<button data-go="${x.vid}|${x.t}">▶ ${fmt(x.t)}</button>`:''}<button data-rm="${esc(x.w)}">✕</button></div>`).join('')}
+$('#bl').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.l){bagLang=b.dataset.l;renderBags()}
+ else if(b.dataset.rm){bags[bagLang]=bags[bagLang].filter(x=>x.w!==b.dataset.rm);if(!bags[bagLang].length)delete bags[bagLang];saveBags();renderBags();renderTranscript();sig=''}
+ else if(b.dataset.go){const[v,t]=b.dataset.go.split('|');loadVideo(v,+t)}
+ else if(b.dataset.x==='clr'){if(confirm(bagLang+' torbası silinsin mi?')){delete bags[bagLang];saveBags();renderBags();renderTranscript();sig=''}}
+ else if(b.dataset.x==='csv'){const rows=[['kelime','cümle','video','saniye'],...bags[bagLang].map(x=>[x.w,x.ctx,x.vid||'',x.t])];
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv'}));a.download='kelimeler-'+bagLang+'.csv';a.click()}});
+$('#bl').addEventListener('input',e=>{if(e.target.id==='q'){q=e.target.value.toLowerCase();const p=e.target.selectionStart;renderBags();const n=$('#q');n.focus();n.setSelectionRange(p,p)}});
+
+/* ---------- oynatıcı ---------- */
+const now=()=>ready&&player.getCurrentTime?player.getCurrentTime():0;
+function parseId(s){const m=s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/)||s.trim().match(/^([\w-]{11})$/);return m&&m[1]}
+function loadVideo(id,start=0){
+ if(id!==vid){const saved=ls.get('sv_v_'+id,null);if(vid===null&&tracks.length){}else tracks=saved||[];vid=id;saveTracks();ls.set('sv_last',id);changed()}
+ if(!ready){pending={id,start};return}
+ player.loadVideoById({videoId:id,startSeconds:start})}
+function onYouTubeIframeAPIReady(){player=new YT.Player('player',{playerVars:{fs:0,rel:0,playsinline:1,cc_load_policy:0},events:{onReady(){ready=true;if(pending)loadVideo(pending.id,pending.start);pending=null;setInterval(tick,100)}}})}
+$('#go').onclick=()=>{const id=parseId($('#url').value);id?loadVideo(id):alert('Geçerli bir YouTube linki gir')};
+$('#url').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};
+function active(t,tr){const x=t-tr.offset;return tr.lines.find(l=>x>=l.start&&x<=l.end)}
+function tick(){const t=now(),vis=tracks.filter(x=>x.visible);if(!vis.length)return;
+ const act=vis.map(tr=>[tr,active(t,tr)]);const s=act.map(a=>a[1]?.text||'').join('|');
+ if(s!==sig){sig=s;$('#ov').innerHTML=act.filter(a=>a[1]).map(([tr,l])=>`<div class="ovl" data-ctx="${esc(l.text)}"><i style="background:${tr.color}"></i>${words(l.text,tr.lang)}</div>`).join('')}
+ const p=vis[0],cl=active(t,p),idx=cl?p.lines.indexOf(cl):-1;
+ if(idx!==curIdx){document.querySelector('.ln.on')?.classList.remove('on');curIdx=idx;const el=idx>=0&&document.querySelector(`.ln[data-i="${idx}"]`);
+  if(el){el.classList.add('on');if(set.scroll){const c=$('#tr');c.scrollTo({top:el.offsetTop-c.offsetTop-c.clientHeight/2+el.clientHeight/2,behavior:'smooth'})}}}
+ if($('#loop').checked&&cl&&t>cl.end+p.offset-.05)player.seekTo(cl.start+p.offset,true)}
+function jump(d){const p=primary();if(!p||!ready)return;const t=now()-p.offset;
+ const l=d>0?p.lines.find(x=>x.start>t+.05):[...p.lines].reverse().find(x=>x.start<t-.6);if(l)player.seekTo(l.start+p.offset,true)}
+const toggle=()=>ready&&(player.getPlayerState()===1?player.pauseVideo():player.playVideo());
+const full=()=>{const w=$('#wrap');document.fullscreenElement?document.exitFullscreen():(w.requestFullscreen||w.webkitRequestFullscreen).call(w)};
+$('#prev').onclick=()=>jump(-1);$('#next').onclick=()=>jump(1);$('#pp').onclick=toggle;$('#fs').onclick=full;
+$('#spd').onchange=e=>ready&&player.setPlaybackRate(+e.target.value);
+document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)&&e.target.type!=='checkbox')return;
+ const k=e.key;if(k===' '){e.preventDefault();toggle()}else if(k==='ArrowLeft'){e.preventDefault();jump(-1)}else if(k==='ArrowRight'){e.preventDefault();jump(1)}
+ else if(k==='r'||k==='R')$('#loop').click();else if(k==='f'||k==='F')full()});
+
+applyTheme();applySet();renderTracks();renderTranscript();
+const last=ls.get('sv_last',null);if(last){$('#url').value='https://youtu.be/'+last;loadVideo(last)}
+</script>
+</body>
+</html>

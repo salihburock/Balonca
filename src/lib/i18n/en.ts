@@ -1,0 +1,28 @@
+import type { MessageKey } from './tr';
+
+export const en: Record<MessageKey, string> = {
+  'nav.home': 'Home',
+  'nav.watch': 'Player',
+  'nav.words': 'My words',
+  'nav.help': 'Help',
+  'theme.auto': 'Theme: auto',
+  'theme.light': 'Theme: light',
+  'theme.dark': 'Theme: dark',
+  'lang.switch': 'Switch language',
+  'home.title': 'Watch, read, learn',
+  'home.lead': 'Open a YouTube video, follow several subtitle languages at once and drop unknown words into your own bags.',
+  'home.cta': 'Get started',
+  'home.how': 'How it works',
+  'home.s1.t': 'Paste a link',
+  'home.s1.d': 'Add the link of any YouTube video.',
+  'home.s2.t': 'Add subtitles',
+  'home.s2.d': 'Upload .srt, .vtt, .json3 or .json; show as many as you like at once.',
+  'home.s3.t': 'Collect words',
+  'home.s3.d': 'Tap a word in a subtitle and it goes into that language’s bag. Review with flashcards later.',
+  'watch.soon': 'The player will live here soon.',
+  'words.soon': 'Your word bag will live here soon.',
+  'help.title': 'Help',
+  'help.soon': 'The FAQ will live here soon.',
+  'notfound': 'Nothing here.',
+  'notfound.back': 'Back to home',
+};

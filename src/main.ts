@@ -1,0 +1,13 @@
+import '@fontsource-variable/nunito';
+import '@fontsource/atkinson-hyperlegible/400.css';
+import '@fontsource/atkinson-hyperlegible/700.css';
+import './styles/tokens.css';
+import './styles/base.css';
+import { mount } from 'svelte';
+import App from './App.svelte';
+import { applyTheme } from './lib/theme.svelte';
+import { i18n } from './lib/i18n/index.svelte';
+
+applyTheme();
+document.documentElement.lang = i18n.locale;
+mount(App, { target: document.getElementById('app')! });

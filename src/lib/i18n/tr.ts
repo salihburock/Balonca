@@ -1,0 +1,28 @@
+export const tr = {
+  'nav.home': 'Ana sayfa',
+  'nav.watch': 'Oynatıcı',
+  'nav.words': 'Kelimelerim',
+  'nav.help': 'Yardım',
+  'theme.auto': 'Tema: otomatik',
+  'theme.light': 'Tema: açık',
+  'theme.dark': 'Tema: koyu',
+  'lang.switch': 'Dil değiştir',
+  'home.title': 'İzle, oku, öğren',
+  'home.lead': 'YouTube videosunu aç, birkaç dilde altyazıyı aynı anda takip et ve bilmediğin kelimeleri kendi torbana at.',
+  'home.cta': 'Hemen başla',
+  'home.how': 'Nasıl çalışır?',
+  'home.s1.t': 'Linki yapıştır',
+  'home.s1.d': 'Herhangi bir YouTube videosunun linkini ekle.',
+  'home.s2.t': 'Altyazıları ekle',
+  'home.s2.d': '.srt, .vtt, .json3 veya .json yükle; istediklerini aynı anda aç.',
+  'home.s3.t': 'Kelime topla',
+  'home.s3.d': 'Altyazıdaki kelimeye dokun, o dilin torbasına girsin. Sonra kartlarla tekrar et.',
+  'watch.soon': 'Oynatıcı yakında burada olacak.',
+  'words.soon': 'Kelime torban yakında burada olacak.',
+  'help.title': 'Yardım',
+  'help.soon': 'SSS yakında burada olacak.',
+  'notfound': 'Burada bir şey yok.',
+  'notfound.back': 'Ana sayfaya dön',
+} as const;
+
+export type MessageKey = keyof typeof tr;

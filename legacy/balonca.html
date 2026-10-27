@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balonca · Altyazıyla dil öğren</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf7ff;--card:#fff;--tx:#2a2540;--mut:#7a7394;--ln:#ece6f7;--ac:#8b6cf6;--ac2:#ff8fb8;--hl:#efe9ff;--r:18px;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#15131c;--card:#1f1c2b;--tx:#f0ecfa;--mut:#a39cbb;--ln:#2e2a3f;--ac:#a995ff;--hl:#2d2850;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#15131c;--card:#1f1c2b;--tx:#f0ecfa;--mut:#a39cbb;--ln:#2e2a3f;--ac:#a995ff;--hl:#2d2850;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:500 15px/1.5 Nunito,ui-rounded,system-ui,sans-serif}
+h1,h2,h3{font-weight:800;margin:0}
+header{display:flex;gap:8px;align-items:center;padding:10px 14px;position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
+.logo{display:flex;align-items:center;gap:6px;color:var(--tx);text-decoration:none;font-weight:800;font-size:19px}
+.logo svg{width:34px;height:34px}
+nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto}
+nav a{padding:7px 12px;border-radius:99px;color:var(--mut);text-decoration:none;font-weight:700;white-space:nowrap}
+nav a.on{background:var(--hl);color:var(--ac)}
+input,select,button,textarea{font:inherit;color:var(--tx)}
+input:not([type]),input[type=text],select,textarea{background:var(--card);border:1.5px solid var(--ln);border-radius:12px;padding:9px 12px}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px solid color-mix(in srgb,var(--ac) 45%,transparent);outline-offset:1px}
+button{background:var(--card);border:1.5px solid var(--ln);border-radius:12px;padding:8px 13px;cursor:pointer;font-weight:700;transition:transform .12s}
+button:hover{transform:translateY(-1px)}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+main{max-width:1200px;margin:0 auto;padding:14px}
+section[data-page]{display:none}section.on{display:block}
+.card{background:var(--card);border:1.5px solid var(--ln);border-radius:var(--r);padding:14px;box-shadow:0 6px 20px rgba(139,108,246,.07)}
+.hero{text-align:center;padding:36px 8px 24px}
+.hero svg{width:110px;height:110px;animation:fl 3s ease-in-out infinite}
+.hero h1{font-size:clamp(28px,6vw,46px);margin:10px 0}
+.hero p{color:var(--mut);max-width:560px;margin:0 auto 18px;font-size:17px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.steps .card h3{color:var(--ac);margin-bottom:4px}
+@keyframes fl{50%{transform:translateY(-8px)}}
+@keyframes pop{40%{transform:scale(1.35)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.row>input:not([type]){flex:1;min-width:120px}
+#wrap{position:relative;background:#000;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden}
+#wrap:fullscreen{aspect-ratio:auto;width:100vw;height:100vh;border-radius:0}
+#player,#player iframe{position:absolute;inset:0;width:100%;height:100%}
+#ov{position:absolute;left:3%;right:3%;bottom:9%;display:flex;flex-direction:column;gap:4px;align-items:center;pointer-events:none;z-index:5}
+.ovl{background:rgba(0,0,0,var(--bgo,.55));color:#fff;padding:3px 12px;border-radius:10px;text-align:center;font-size:var(--fs,26px);line-height:1.3;text-shadow:0 1px 2px #000}
+.ovl i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
+.hide2 .ovl.sec:not(.rev){filter:blur(7px);pointer-events:auto;cursor:pointer}
+.w{cursor:pointer;pointer-events:auto;border-radius:4px;display:inline-block}
+.w:hover{background:var(--ac);color:#fff}
+.w.sv{text-decoration:underline wavy var(--ac2);text-underline-offset:4px}
+.w.pop{animation:pop .3s}
+.tabs{display:flex;gap:4px;margin-bottom:8px;background:var(--hl);padding:4px;border-radius:14px}
+.tabs button{flex:1;border:0;background:none}
+.tabs button.on{background:var(--card);color:var(--ac);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.pane{display:none}.pane.on{display:block}
+#tr{max-height:60vh;overflow-y:auto;position:relative}
+.ln{display:flex;gap:8px;padding:7px 8px;border-radius:12px;cursor:pointer}
+.ln.on{background:var(--hl)}
+.tm{color:var(--mut);font-size:11px;min-width:36px;padding-top:4px}
+.oth{font-size:13px;margin-top:2px}
+.trk{display:flex;gap:6px;align-items:center;padding:7px 0;border-top:1px solid var(--ln);flex-wrap:wrap}
+.trk .lang{width:105px}.trk input[type=color]{width:30px;height:30px;padding:0;border:0;background:none}
+.trk .nm{color:var(--mut);font-size:12px;flex:1}.trk button{padding:3px 9px}
+#drop{border:2px dashed var(--ln);border-radius:14px;padding:16px;text-align:center;color:var(--mut);cursor:pointer;margin:8px 0}
+#drop.over{border-color:var(--ac);color:var(--ac)}
+textarea{width:100%;height:70px;resize:vertical}
+.mut{color:var(--mut);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.stat{text-align:center}.stat b{display:block;font-size:26px;color:var(--ac)}
+.chip{border-radius:99px;padding:5px 12px}.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.bw{display:flex;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--ln)}
+.bw>div{flex:1;min-width:0}
+#rv{text-align:center;padding:24px 10px}
+#rv .big{font-size:32px;font-weight:800;color:var(--ac)}
+#rv .cx{margin:12px 0;color:var(--mut);min-height:48px}
+#rv .cx.hid{filter:blur(8px)}
+details{border-top:1px solid var(--ln);padding:10px 0}summary{font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><symbol id="mas" viewBox="0 0 100 100"><path style="fill:var(--ac)" d="M18 14h64a12 12 0 0 1 12 12v36a12 12 0 0 1-12 12H56L38 92V74H18A12 12 0 0 1 6 62V26A12 12 0 0 1 18 14z"/><circle cx="36" cy="46" r="5" fill="#fff"/><circle cx="64" cy="46" r="5" fill="#fff"/><path d="M42 58q8 8 16 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="26" cy="58" r="5" fill="#ff8fb8" opacity=".75"/><circle cx="74" cy="58" r="5" fill="#ff8fb8" opacity=".75"/></symbol></svg>
+<header>
+  <a class="logo" href="#/"><svg><use href="#mas"/></svg>Balonca</a>
+  <nav><a href="#/" data-r="home" data-i="n_home"></a><a href="#/watch" data-r="watch" data-i="n_watch"></a><a href="#/words" data-r="words" data-i="n_words"></a><a href="#/help" data-r="help" data-i="n_help"></a></nav>
+  <button id="lg" aria-label="Language">TR</button><button id="th" aria-label="Theme">🌓</button>
+</header>
+<main>
+<section data-page="home">
+  <div class="hero"><svg><use href="#mas"/></svg><h1 data-i="h1"></h1><p data-i="h2"></p><a href="#/watch"><button class="p" data-i="cta" style="font-size:17px;padding:12px 26px"></button></a></div>
+  <div class="steps"><div class="card"><h3 data-i="s1"></h3><span data-i="s1d" class="mut"></span></div><div class="card"><h3 data-i="s2"></h3><span data-i="s2d" class="mut"></span></div><div class="card"><h3 data-i="s3"></h3><span data-i="s3d" class="mut"></span></div></div>
+</section>
+
+<section data-page="watch"><div class="grid">
+  <div>
+    <div class="row"><input id="url" data-ph="link"><button class="p" id="go" data-i="load"></button></div>
+    <div id="wrap"><div id="player"></div><div id="ov"></div></div>
+    <div class="row">
+      <button id="prev" aria-label="Önceki satır">⏮</button><button id="pp" aria-label="Oynat/Duraklat">⏯</button><button id="next" aria-label="Sonraki satır">⏭</button>
+      <select id="spd" aria-label="Hız"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select>
+      <label class="mut"><input type="checkbox" id="loop"> <span data-i="loop"></span></label>
+      <button id="fs" style="margin-left:auto">⛶</button>
+    </div>
+  </div>
+  <aside class="card">
+    <div class="tabs" role="tablist"><button class="on" data-p="tr" data-i="tr"></button><button data-p="fl" data-i="fl"></button><button data-p="st" data-i="st"></button></div>
+    <div class="pane on" id="tr"></div>
+    <div class="pane" id="fl">
+      <div id="tracks"></div>
+      <div id="drop" tabindex="0" data-i="drop"></div><input type="file" id="file" multiple accept=".srt,.vtt,.json,.json3,.txt" hidden>
+      <div class="mut" data-i="paste"></div>
+      <textarea id="pt" aria-label="Subtitle text"></textarea>
+      <div class="row"><input id="pl" data-ph="lang" style="max-width:140px"><button id="pa" data-i="add"></button></div>
+      <div class="mut" id="note"></div>
+    </div>
+    <div class="pane" id="st">
+      <div class="row"><span data-i="fsz"></span><input type="range" id="fsz" min="14" max="48"></div>
+      <div class="row"><span data-i="bgo"></span><input type="range" id="bgo" min="0" max="100"></div>
+      <div class="row"><label><input type="checkbox" id="pz"> <span data-i="pz"></span></label></div>
+      <div class="row"><label><input type="checkbox" id="as"> <span data-i="as"></span></label></div>
+      <div class="row"><label><input type="checkbox" id="h2"> <span data-i="hide2"></span></label></div>
+      <div class="row"><label><input type="checkbox" id="ap"> <span data-i="ap"></span></label></div>
+      <p class="mut">Space · ← → · R · F</p>
+    </div>
+  </aside>
+</div></section>
+
+<section data-page="words">
+  <div class="stats"><div class="card stat"><b id="s1n">0</b><span class="mut" data-i="total"></span></div><div class="card stat"><b id="s2n">0</b><span class="mut" data-i="due"></span></div><div class="card stat"><b id="s3n">0</b><span class="mut" data-i="learned"></span></div></div>
+  <div class="card"><div id="chips" class="row"></div>
+    <div class="row"><input id="q" data-ph="q"><button class="p" id="rvb" data-i="review"></button><button id="csv">CSV</button><button id="clr" data-i="clr"></button></div>
+    <div id="rv" hidden></div><div id="bl"></div></div>
+  <div class="card row" style="margin-top:12px"><b data-i="backup"></b><button id="exp" data-i="exp"></button><button id="imp" data-i="imp"></button><input type="file" id="impf" accept=".json" hidden></div>
+</section>
+
+<section data-page="help"><div class="card">
+  <h2 data-i="n_help"></h2>
+  <details open><summary data-i="f1q"></summary><p data-i="f1a"></p></details>
+  <details><summary data-i="f2q"></summary><p data-i="f2a"></p></details>
+  <details><summary data-i="f3q"></summary><p data-i="f3a"></p></details>
+  <details><summary data-i="f4q"></summary><p data-i="f4a"></p></details>
+</div></section>
+</main>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const T={tr:{n_home:'Ana sayfa',n_watch:'Oynatıcı',n_words:'Kelimelerim',n_help:'Yardım',h1:'İzle, oku, öğren 💬',h2:'YouTube videosunu aç, altyazı dosyalarını ekle, birkaç dili aynı anda takip et ve bilmediğin kelimeleri kendi torbana at.',cta:'Hemen başla',s1:'1 · Linki yapıştır',s1d:'Herhangi bir YouTube videosunun linkini ekle.',s2:'2 · Altyazıları ekle',s2d:'.srt, .vtt, .json3 veya .json yükle; istediklerini aynı anda aç.',s3:'3 · Kelime topla',s3d:'Altyazıdaki kelimeye dokun, o dilin torbasına girsin. Sonra kartlarla tekrar et.',load:'Yükle',link:'YouTube linki',tr:'Transkript',fl:'Dosyalar',st:'Ayarlar',drop:'Altyazı dosyalarını sürükle veya seç',paste:'Ya da altyazı metnini yapıştır:',lang:'Dil adı',add:'Ekle',fsz:'Yazı boyutu',bgo:'Arka plan',pz:'Kelime kaydedince duraklat',as:'Transkripti otomatik kaydır',hide2:'İkinci ve sonraki altyazıları bulanık göster (tıkla aç)',ap:'Her satır sonunda duraklat',loop:'Satırı tekrarla',nosub:'Henüz altyazı yok 🫧 Dosyalar sekmesinden ekle.',nobag:'Torban boş 🫧 Oynatıcıda bir kelimeye dokun.',q:'Ara…',total:'Kelime',due:'Tekrar zamanı',learned:'Öğrenilen',review:'Tekrar et',show:'Göster',again:'Tekrar',good:'İyi',easy:'Kolay',done:'Bugünlük bitti 🎉',fin:'Bitir',backup:'Yedek',exp:'Dışa aktar',imp:'İçe aktar',clr:'Torbayı boşalt',ok:'Silinsin mi?',offn:'YouTube oynatıcısı için siteyi bir sunucudan aç (dosyadan değil).',bad:'Okunamadı: ',badlink:'Geçerli bir YouTube linki gir',f1q:'Verilerim nerede?',f1a:'Altyazılar, kelimeler ve ayarlar sadece bu tarayıcıda (IndexedDB) saklanır. Başka cihaza taşımak için Kelimelerim sayfasından yedek al.',f2q:'Hangi dosyalar olur?',f2a:'.srt, .vtt, YouTube .json3 ve [{start,end,text}] biçiminde .json. Metni yapıştırarak da ekleyebilirsin.',f3q:'Altyazıyı nereden bulurum?',f3a:'yt-dlp --write-auto-subs --sub-langs nl --sub-format json3 --skip-download LINK komutuyla otomatik altyazıyı indirebilir, istediğin araçla çevirebilirsin.',f4q:'Telif hakkı',f4a:'Video YouTube’un resmi oynatıcısıyla gösterilir, hiçbir video indirilmez veya barındırılmaz. Aracı kişisel öğrenme için kullan ve içerik sahiplerinin haklarına saygı göster.'},
+en:{n_home:'Home',n_watch:'Player',n_words:'My words',n_help:'Help',h1:'Watch, read, learn 💬',h2:'Open a YouTube video, add subtitle files, follow several languages at once and drop unknown words into your own bags.',cta:'Get started',s1:'1 · Paste a link',s1d:'Add the link of any YouTube video.',s2:'2 · Add subtitles',s2d:'Upload .srt, .vtt, .json3 or .json; show as many as you like at once.',s3:'3 · Collect words',s3d:'Tap a word in a subtitle and it goes into that language’s bag. Review with flashcards later.',load:'Load',link:'YouTube link',tr:'Transcript',fl:'Files',st:'Settings',drop:'Drop subtitle files or click to choose',paste:'Or paste subtitle text:',lang:'Language name',add:'Add',fsz:'Font size',bgo:'Background',pz:'Pause when saving a word',as:'Auto-scroll transcript',hide2:'Blur 2nd+ subtitle lines (click to reveal)',ap:'Pause at the end of each line',loop:'Repeat line',nosub:'No subtitles yet 🫧 Add some in the Files tab.',nobag:'Your bag is empty 🫧 Tap a word in the player.',q:'Search…',total:'Words',due:'Due',learned:'Learned',review:'Review',show:'Show',again:'Again',good:'Good',easy:'Easy',done:'All done for today 🎉',fin:'Finish',backup:'Backup',exp:'Export',imp:'Import',clr:'Empty bag',ok:'Delete?',offn:'Open this site from a server (not as a file) so the YouTube player works.',bad:'Could not read: ',badlink:'Enter a valid YouTube link',f1q:'Where is my data?',f1a:'Subtitles, words and settings are stored only in this browser (IndexedDB). Use Export on My words to move them.',f2q:'Which files work?',f2a:'.srt, .vtt, YouTube .json3 and .json as [{start,end,text}]. You can also paste text.',f3q:'Where do I get subtitles?',f3a:'Run yt-dlp --write-auto-subs --sub-langs nl --sub-format json3 --skip-download LINK, then translate with any tool you like.',f4q:'Copyright',f4a:'Videos play through YouTube’s official player; nothing is downloaded or hosted. Use this for personal learning and respect creators’ rights.'}};
+const t=k=>(T[S.set.lang]||T.tr)[k]||k;
+
+/* ---- state (IndexedDB) ---- */
+let S={set:{theme:'auto',lang:'tr',size:26,bg:55,pause:true,scroll:true,hide2:false,ap:false},bags:{},vids:{},last:null};
+const db=new Promise(r=>{try{const q=indexedDB.open('balonca',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch{r(null)}});
+const idb=async(m,k,v)=>{const d=await db;if(!d)return;return new Promise(r=>{const o=d.transaction('k',m==='get'?'readonly':'readwrite').objectStore('k'),q=m==='get'?o.get(k):o.put(v,k);q.onsuccess=()=>r(q.result);q.onerror=()=>r()})};
+let st=0;const save=()=>{clearTimeout(st);st=setTimeout(()=>idb('put','state',JSON.parse(JSON.stringify(S))),300)};
+let tracks=[],vid=null,player=null,ready=false,pending=null,bagLang=null,sig='',curIdx=-1,pz2=-1,rv=null,q='';
+const COL=['#ffb020','#2dd4a7','#38bdf8','#ff8fb8','#a995ff'];
+const NAMES={nl:'Felemenkçe',tr:'Türkçe',en:'İngilizce',de:'Almanca',fr:'Fransızca',es:'İspanyolca',it:'İtalyanca',ru:'Rusça',ja:'Japonca',ar:'Arapça'};
+
+/* ---- i18n, tema, rota ---- */
+function applyI18n(){document.documentElement.lang=S.set.lang;$$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('[data-ph]').forEach(e=>e.placeholder=t(e.dataset.ph));$('#lg').textContent=S.set.lang.toUpperCase();renderTracks();renderTranscript();renderWords()}
+function applyTheme(){const r=document.documentElement,s=S.set;s.theme==='auto'?r.removeAttribute('data-theme'):r.dataset.theme=s.theme;$('#th').textContent={auto:'🌓',light:'☀️',dark:'🌙'}[s.theme];const d=document.documentElement.style;d.setProperty('--fs',s.size+'px');d.setProperty('--bgo',s.bg/100);document.body.classList.toggle('hide2',s.hide2);$('#fsz').value=s.size;$('#bgo').value=s.bg;$('#pz').checked=s.pause;$('#as').checked=s.scroll;$('#h2').checked=s.hide2;$('#ap').checked=s.ap}
+$('#th').onclick=()=>{S.set.theme={auto:'light',light:'dark',dark:'auto'}[S.set.theme];applyTheme();save()};
+$('#lg').onclick=()=>{S.set.lang=S.set.lang==='tr'?'en':'tr';applyI18n();save()};
+[['fsz','size'],['bgo','bg']].forEach(([i,k])=>$('#'+i).oninput=e=>{S.set[k]=+e.target.value;applyTheme();save()});
+[['pz','pause'],['as','scroll'],['h2','hide2'],['ap','ap']].forEach(([i,k])=>$('#'+i).onchange=e=>{S.set[k]=e.target.checked;applyTheme();save()});
+function route(){const p=location.hash.slice(2)||'home';$$('section[data-page]').forEach(s=>s.classList.toggle('on',s.dataset.page===p));$$('nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===p));if(p!=='watch'&&ready&&player.pauseVideo)player.pauseVideo();if(p==='words')renderWords();scrollTo(0,0)}
+addEventListener('hashchange',route);
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button,.pane').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.p).classList.add('on')});
+
+/* ---- altyazı ayrıştırma ---- */
+const ts=s=>{const m=s.trim().replace(',','.').split(':').map(parseFloat);return m.length==3?m[0]*3600+m[1]*60+m[2]:m[0]*60+m[1]};
+function parseText(x){const o=[];for(const b of x.replace(/\r/g,'').split(/\n\s*\n/)){const L=b.split('\n'),i=L.findIndex(l=>l.includes('-->'));if(i<0)continue;const[a,c]=L[i].split('-->'),tx=L.slice(i+1).join(' ').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();if(tx)o.push({start:ts(a),end:ts(c.trim().split(' ')[0]),text:tx})}return o}
+function parseAny(x){const s=x.replace(/^\uFEFF/,'').trim();let L;
+ if(s[0]=='[')L=JSON.parse(s).map(v=>({start:+v.start,end:+v.end,text:String(v.text)}));
+ else if(s[0]=='{')L=(JSON.parse(s).events||[]).filter(e=>e.segs).map(e=>({start:e.tStartMs/1000,end:(e.tStartMs+(e.dDurationMs||2000))/1000,text:e.segs.map(g=>g.utf8||'').join('').replace(/\s+/g,' ').trim()})).filter(v=>v.text);
+ else L=parseText(s);
+ L.sort((a,b)=>a.start-b.start);const o=[];for(const l of L){const p=o[o.length-1];if(p&&p.text==l.text&&l.start<=p.end+.3)p.end=Math.max(p.end,l.end);else o.push(l)}return o}
+function addTrack(txt,name,lang){try{const lines=parseAny(txt);if(!lines.length)throw 0;tracks.push({id:Date.now()+Math.random(),name,lang,color:COL[tracks.length%COL.length],visible:true,offset:0,lines});changed()}catch{$('#note').textContent=t('bad')+name}}
+async function addFiles(fs){for(const f of fs){const m=f.name.match(/\.([a-z]{2,3})(?:-[A-Za-z]+)?\.(srt|vtt|json3|json|txt)$/i),c=m&&m[1].toLowerCase();addTrack(await f.text(),f.name,c?(NAMES[c]||c):f.name.replace(/\.[^.]+$/,''))}}
+function changed(){save();renderTracks();renderTranscript();sig='';curIdx=-1}
+$('#drop').onclick=()=>$('#file').click();$('#drop').onkeydown=e=>e.key==='Enter'&&$('#file').click();
+$('#file').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+['dragover','dragenter'].forEach(v=>$('#drop').addEventListener(v,e=>{e.preventDefault();$('#drop').classList.add('over')}));
+['dragleave','drop'].forEach(v=>$('#drop').addEventListener(v,e=>{e.preventDefault();$('#drop').classList.remove('over')}));
+$('#drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+$('#pa').onclick=()=>{const v=$('#pt').value;if(v.trim()){addTrack(v,'metin',$('#pl').value.trim()||'?');$('#pt').value=''}};
+
+/* ---- kelimeler ---- */
+const norm=w=>w.toLocaleLowerCase(),isSaved=(w,l)=>(S.bags[l]||[]).some(x=>x.w===w);
+const words=(x,l)=>x.replace(/[\p{L}\p{N}][\p{L}\p{N}'’-]*|[^\p{L}\p{N}]+/gu,m=>/^[\p{L}\p{N}]/u.test(m)?`<span class="w${isSaved(norm(m),l)?' sv':''}" data-w="${esc(norm(m))}" data-l="${esc(l)}">${esc(m)}</span>`:esc(m));
+const now=()=>ready&&player.getCurrentTime?player.getCurrentTime():0;
+document.addEventListener('click',e=>{const sec=e.target.closest('.ovl.sec');const el=e.target.closest('.w');
+ if(!el){if(sec)sec.classList.add('rev');return}
+ e.stopPropagation();const w=el.dataset.w,l=el.dataset.l,a=S.bags[l]||(S.bags[l]=[]),i=a.findIndex(x=>x.w===w);
+ if(i>=0)a.splice(i,1);else{a.push({w,ctx:el.closest('[data-ctx]')?.dataset.ctx||'',vid,t:Math.round(now())});if(S.set.pause&&ready)player.pauseVideo()}
+ if(!a.length)delete S.bags[l];save();
+ $$('.w').forEach(x=>{if(x.dataset.w===w&&x.dataset.l===l)x.classList.toggle('sv',isSaved(w,l))});
+ el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),300)},true);
+
+/* ---- görünüm: dosyalar & transkript ---- */
+const fmt=s=>{s=Math.max(0,s|0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function renderTracks(){$('#tracks').innerHTML=tracks.map(x=>`<div class="trk" data-id="${x.id}"><input type="checkbox" data-a="vis" aria-label="Göster" ${x.visible?'checked':''}><input type="color" data-a="col" value="${x.color}"><input class="lang" data-a="lang" value="${esc(x.lang)}" aria-label="${t('lang')}"><span class="nm">${x.lines.length}</span><button data-a="m">−</button><b>${x.offset.toFixed(1)}s</b><button data-a="p">+</button><button data-a="del" aria-label="Sil">✕</button></div>`).join('');$('#note').textContent=location.protocol==='file:'?t('offn'):''}
+const tr=e=>{const r=e.target.closest('.trk');return r&&tracks.find(x=>x.id==r.dataset.id)};
+$('#tracks').addEventListener('click',e=>{const x=tr(e),a=e.target.dataset.a;if(!x)return;if(a==='del')tracks.splice(tracks.indexOf(x),1);else if(a==='m')x.offset-=.2;else if(a==='p')x.offset+=.2;else return;changed()});
+$('#tracks').addEventListener('change',e=>{const x=tr(e),a=e.target.dataset.a;if(!x)return;if(a==='vis')x.visible=e.target.checked;else if(a==='col')x.color=e.target.value;else if(a==='lang')x.lang=e.target.value.trim()||x.lang;changed()});
+const primary=()=>tracks.find(x=>x.visible);
+function renderTranscript(){const p=primary();if(!p){$('#tr').innerHTML=`<p class="mut">${t('nosub')}</p>`;return}const os=tracks.filter(x=>x.visible&&x!==p);
+ $('#tr').innerHTML=p.lines.map((l,i)=>{const mid=(l.start+l.end)/2+p.offset,oh=os.map(o=>{const z=o.lines.find(v=>mid>=v.start+o.offset&&mid<=v.end+o.offset);return z?`<div class="oth" style="color:${o.color}" data-ctx="${esc(z.text)}">${words(z.text,o.lang)}</div>`:''}).join('');
+  return`<div class="ln" data-i="${i}" data-ctx="${esc(l.text)}"><span class="tm">${fmt(l.start)}</span><div>${words(l.text,p.lang)}${oh}</div></div>`}).join('')}
+$('#tr').addEventListener('click',e=>{const n=e.target.closest('.ln');if(n&&ready){const p=primary();player.seekTo(p.lines[n.dataset.i].start+p.offset,true)}});
+
+/* ---- kelimelerim + tekrar ---- */
+const isDue=x=>!x.due||x.due<=Date.now();
+function renderWords(){const ls=Object.keys(S.bags),all=ls.flatMap(l=>S.bags[l]);
+ $('#s1n').textContent=all.length;$('#s2n').textContent=all.filter(isDue).length;$('#s3n').textContent=all.filter(x=>(x.ivl||0)>=7).length;
+ if(!ls.length){$('#chips').innerHTML='';$('#bl').innerHTML=`<p class="mut">${t('nobag')}</p>`;$('#rv').hidden=true;return}
+ if(!ls.includes(bagLang))bagLang=ls[0];
+ $('#chips').innerHTML=ls.map(l=>`<button class="chip${l===bagLang?' on':''}" data-l="${esc(l)}">${esc(l)} (${S.bags[l].length})</button>`).join('');
+ const it=S.bags[bagLang].filter(x=>!q||(x.w+x.ctx).toLowerCase().includes(q));
+ $('#bl').innerHTML=it.map(x=>`<div class="bw"><div><b>${esc(x.w)}</b><div class="mut">${esc(x.ctx)}</div></div>${x.vid?`<button data-go="${x.vid}|${x.t}">▶ ${fmt(x.t)}</button>`:''}<button data-rm="${esc(x.w)}" aria-label="Sil">✕</button></div>`).join('')}
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(b){bagLang=b.dataset.l;rv=null;$('#rv').hidden=true;renderWords()}};
+$('#q').oninput=e=>{q=e.target.value.toLowerCase();renderWords()};
+$('#bl').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.rm){S.bags[bagLang]=S.bags[bagLang].filter(x=>x.w!==b.dataset.rm);if(!S.bags[bagLang].length)delete S.bags[bagLang];save();renderWords();renderTranscript()}
+ else if(b.dataset.go){const[v,s]=b.dataset.go.split('|');location.hash='#/watch';loadVideo(v,+s)}};
+$('#clr').onclick=()=>{if(bagLang&&confirm(t('ok'))){delete S.bags[bagLang];save();renderWords();renderTranscript()}};
+$('#csv').onclick=()=>{if(!bagLang)return;const rows=[['word','context','video','sec'],...S.bags[bagLang].map(x=>[x.w,x.ctx,x.vid||'',x.t])],c=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+c],{type:'text/csv'}));a.download=bagLang+'.csv';a.click()};
+$('#rvb').onclick=()=>{if(!bagLang)return;rv={l:S.bags[bagLang].filter(isDue).sort(()=>Math.random()-.5),sh:false};$('#rv').hidden=false;drawRv()};
+function drawRv(){const r=$('#rv');if(!rv.l.length){r.innerHTML=`<div class="big">${t('done')}</div><button class="p" data-k="fin">${t('fin')}</button>`;return}const x=rv.l[0];
+ r.innerHTML=`<div class="big">${esc(x.w)}</div><div class="cx${rv.sh?'':' hid'}">${esc(x.ctx)}</div>`+(rv.sh?['again','good','easy'].map(k=>`<button class="${k==='good'?'p':''}" data-k="${k}">${t(k)}</button> `).join(''):`<button class="p" data-k="show">${t('show')}</button>`)}
+$('#rv').onclick=e=>{const k=e.target.dataset.k;if(!k)return;
+ if(k==='show'){rv.sh=true}else if(k==='fin'){rv=null;$('#rv').hidden=true;renderWords();return}
+ else{const x=rv.l.shift(),d=864e5;if(k==='again'){x.ivl=0;x.due=Date.now()+6e5;rv.l.push(x)}else{x.ivl=k==='good'?(x.ivl?x.ivl*2:1):(x.ivl?x.ivl*3:3);x.due=Date.now()+x.ivl*d}rv.sh=false;save()}
+ drawRv()};
+$('#exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='balonca-backup.json';a.click()};
+$('#imp').onclick=()=>$('#impf').click();
+$('#impf').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.bags||!d.vids)throw 0;S={...S,...d,set:{...S.set,...d.set}};save();tracks=[];vid=null;if(S.last)loadVideo(S.last);applyTheme();applyI18n()}catch{alert(t('bad'))}e.target.value=''};
+
+/* ---- oynatıcı ---- */
+const parseId=s=>{const m=s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/)||s.trim().match(/^([\w-]{11})$/);return m&&m[1]};
+function loadVideo(id,start=0){if(id!==vid){if(vid===null&&tracks.length)S.vids[id]=tracks;else tracks=S.vids[id]||(S.vids[id]=[]);vid=id;S.last=id;$('#url').value='https://youtu.be/'+id;changed()}
+ if(!ready){pending={id,start};return}player.loadVideoById({videoId:id,startSeconds:start})}
+function onYouTubeIframeAPIReady(){player=new YT.Player('player',{playerVars:{fs:0,rel:0,playsinline:1},events:{onReady(){ready=true;if(pending)loadVideo(pending.id,pending.start);pending=null;setInterval(tick,100)}}})}
+$('#go').onclick=()=>{const id=parseId($('#url').value);id?loadVideo(id):alert(t('badlink'))};
+$('#url').onkeydown=e=>e.key==='Enter'&&$('#go').click();
+const active=(x,r)=>{const v=x-r.offset;return r.lines.find(l=>v>=l.start&&v<=l.end)};
+function tick(){const x=now(),vis=tracks.filter(v=>v.visible);if(!vis.length)return;
+ const act=vis.map(r=>[r,active(x,r)]),s=act.map(a=>a[1]?.text||'').join('|');
+ if(s!==sig){sig=s;$('#ov').innerHTML=act.map(([r,l],i)=>l?`<div class="ovl${i?' sec':''}" data-ctx="${esc(l.text)}"><i style="background:${r.color}"></i>${words(l.text,r.lang)}</div>`:'').join('')}
+ const p=vis[0],cl=active(x,p),idx=cl?p.lines.indexOf(cl):-1;
+ if(idx!==curIdx){$('.ln.on')?.classList.remove('on');curIdx=idx;pz2=-1;const el=idx>=0&&$(`.ln[data-i="${idx}"]`);if(el){el.classList.add('on');if(S.set.scroll){const c=$('#tr');c.scrollTo({top:el.offsetTop-c.offsetTop-c.clientHeight/2+el.clientHeight/2,behavior:'smooth'})}}}
+ if(cl){const e=cl.end+p.offset;if($('#loop').checked&&x>e-.05)player.seekTo(cl.start+p.offset,true);else if(S.set.ap&&x>e-.1&&pz2!==idx){pz2=idx;player.pauseVideo()}}}
+function jump(d){const p=primary();if(!p||!ready)return;const x=now()-p.offset,l=d>0?p.lines.find(v=>v.start>x+.05):[...p.lines].reverse().find(v=>v.start<x-.6);if(l)player.seekTo(l.start+p.offset,true)}
+const toggle=()=>ready&&(player.getPlayerState()===1?player.pauseVideo():player.playVideo());
+const full=()=>{const w=$('#wrap');document.fullscreenElement?document.exitFullscreen():(w.requestFullscreen||w.webkitRequestFullscreen).call(w)};
+$('#prev').onclick=()=>jump(-1);$('#next').onclick=()=>jump(1);$('#pp').onclick=toggle;$('#fs').onclick=full;
+$('#spd').onchange=e=>ready&&player.setPlaybackRate(+e.target.value);
+document.addEventListener('keydown',e=>{if(location.hash!=='#/watch'||(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)&&e.target.type!=='checkbox'))return;const k=e.key;
+ if(k===' '){e.preventDefault();toggle()}else if(k==='ArrowLeft'){e.preventDefault();jump(-1)}else if(k==='ArrowRight'){e.preventDefault();jump(1)}else if(/^r$/i.test(k))$('#loop').click();else if(/^f$/i.test(k))full()});
+
+/* ---- başlat ---- */
+function init(){applyTheme();applyI18n();route();if(S.last)loadVideo(S.last)}
+idb('get','state').then(s=>{if(s)S={...S,...s,set:{...S.set,...s.set}}}).catch(()=>{}).finally(init);
+</script>
+</body>
+</html>

@@ -2,13 +2,17 @@
 
 Kurulum:  pip install yt-dlp anthropic
 Çalıştır: export ANTHROPIC_API_KEY=...   (Windows: set ANTHROPIC_API_KEY=...)
-          python translate.py
+          python translate.py                       # aşağıdaki varsayılan video
+          python translate.py URL [kaynak_dil] [hedef_dil]
+          python translate.py https://youtu.be/XXXXXXXXXXX nl Türkçe
+Çıktı: subs.json  (Balonca'ya "Altyazılar" sekmesinden yükle)
 """
 import glob, json, os, subprocess, sys
 import anthropic
 
-URL = "https://youtu.be/abcdefghijk"
-LANG = "nl"          # altyazı dili
+URL = sys.argv[1] if len(sys.argv) > 1 else "https://youtu.be/abcdefghijk"
+LANG = sys.argv[2] if len(sys.argv) > 2 else "nl"          # altyazı dili
+TARGET = sys.argv[3] if len(sys.argv) > 3 else "Türkçe"    # hedef dil
 BATCH = 25
 MODEL = "claude-sonnet-5-5"
 
@@ -41,7 +45,7 @@ client = anthropic.Anthropic()
 SYSTEM = (
     "Sen çizgi film altyazı çevirmenisin. Girdi, Flamanca (Felemenkçe) otomatik altyazı satırlarından "
     "oluşan bir JSON listesidir; noktalama yok, hatalar ve bölünmüş cümleler olabilir. Bağlama göre "
-    "düzelterek doğal, kısa, konuşma dilinde Türkçeye çevir. SADECE aynı uzunlukta bir JSON string "
+    f"düzelterek doğal, kısa, konuşma dilinde {TARGET} diline çevir. SADECE aynı uzunlukta bir JSON string "
     "listesi döndür; her girdi satırına bir çıktı satırı karşılık gelsin. Başka metin ekleme."
 )
 for i in range(0, len(segs), BATCH):

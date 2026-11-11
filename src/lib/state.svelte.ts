@@ -7,7 +7,7 @@ import { detectLangFromFilename } from './languages';
 import { makeWord, toggleWord, wordId } from './words/bags';
 import { schedule, type Grade } from './srs/scheduler';
 import { setLocale } from './i18n/index.svelte';
-import { EXAMPLE_VIDEO_ID, EXAMPLE_SUBTITLE } from './example';
+import { loadExample, exampleFileUrl } from './example';
 import { theme, applyTheme } from './theme.svelte';
 
 const debounce = <A extends unknown[]>(fn: (...a: A) => void, ms: number) => {
@@ -24,6 +24,8 @@ class AppState {
   tracks = $state<StoredTrack[]>([]);
   savedIds = $derived(new Set(this.words.map((w) => w.id)));
   visibleTracks = $derived(this.tracks.filter((t) => t.visible));
+  /** Video id of the installed example, if this machine has one. */
+  exampleId = $state<string | null>(null);
 
   private db: Db | null = null;
   private persistTracks = debounce(() => {
@@ -34,6 +36,7 @@ class AppState {
   }, 300);
 
   async init(): Promise<void> {
+    void loadExample().then((ex) => (this.exampleId = ex?.videoId ?? null));
     try {
       this.db = await openBalonca();
       this.settings = await loadSettings(this.db);
@@ -69,20 +72,25 @@ class AppState {
   }
 
   /**
-   * Gives the example video its bundled Dutch subtitle, once per browser: if the user later removes it,
-   * it stays removed. Silent on failure (offline, blocked): the example just opens without subtitles.
+   * Gives the example video its installed subtitles, once per browser: if the user later removes them they stay
+   * removed. Silent on failure (offline, blocked): the example just opens without subtitles.
    */
   async seedExample() {
-    if (this.vid !== EXAMPLE_VIDEO_ID || this.tracks.length) return;
+    const ex = await loadExample();
+    if (!ex || this.vid !== ex.videoId || this.tracks.length) return;
     if (this.db && (await this.db.get('meta', 'exampleSeeded'))) return;
+    let added = 0;
     try {
-      const res = await fetch(`${import.meta.env.BASE_URL}examples/${EXAMPLE_SUBTITLE.file}`);
-      if (!res.ok) return;
-      const text = await res.text();
-      if (this.vid !== EXAMPLE_VIDEO_ID || this.tracks.length) return; // the user got ahead of us
-      this.addTrack(text, EXAMPLE_SUBTITLE.file, EXAMPLE_SUBTITLE.lang);
-      if (this.db) await this.db.put('meta', true, 'exampleSeeded');
+      for (const sub of ex.subtitles) {
+        const res = await fetch(exampleFileUrl(sub.file));
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (this.vid !== ex.videoId) return; // the user moved on
+        this.addTrack(text, sub.file, sub.lang);
+        added++;
+      }
     } catch {}
+    if (added && this.db) await this.db.put('meta', true, 'exampleSeeded');
   }
 
   /** Parses subtitle text into a new track. Throws SubtitleParseError on bad input. */

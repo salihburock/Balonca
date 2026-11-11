@@ -10,7 +10,7 @@
   import { player } from '../lib/player/controller.svelte';
   import { router, watchUrl } from '../lib/router.svelte';
   import { parseVideoId } from '../lib/player/youtube';
-  import { EXAMPLE_VIDEO_ID } from '../lib/example';
+  import { loadExample } from '../lib/example';
   import { t } from '../lib/i18n/index.svelte';
 
   type TabId = 'transcript' | 'words' | 'tracks' | 'settings';
@@ -34,15 +34,17 @@
   }
 
   // The URL is the source of truth: #/watch?v=ID&t=SECONDS (also used by "jump to word").
+  // With neither a URL nor a saved video, a machine that has an example installed opens that one.
   $effect(() => {
     if (router.route !== 'watch') { untrack(() => player.pause()); return; }
-    const v = router.params.get('v') ?? untrack(() => app.vid) ?? EXAMPLE_VIDEO_ID; // first visit: the example video
+    const fromUrl = router.params.get('v');
     const at = Number(router.params.get('t')) || 0;
-    if (!v || !parseVideoId(v)) return;
     untrack(async () => {
+      const v = fromUrl ?? app.vid ?? (await loadExample())?.videoId;
+      if (!v || !parseVideoId(v)) return;
       await app.openVideo(v);
       url = `https://youtu.be/${v}`;
-      if (v === EXAMPLE_VIDEO_ID) void app.seedExample();
+      void app.seedExample();
       if (player.loaded !== v) player.load(v, at);
       else if (at) player.seek(at);
     });

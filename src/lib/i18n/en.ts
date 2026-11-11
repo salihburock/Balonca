@@ -116,7 +116,7 @@ export const en: Record<MessageKey, string> = {
   'ytsubs.err.ytdlp-missing': 'yt-dlp is not installed on the server. Whoever runs the service needs to install it.',
   'ytsubs.err.failed': 'The subtitle could not be retrieved. Try again.',
   'ytsubs.err.cancelled': 'Cancelled.',
-  'transcript.example': 'This is an example video: a Flemish cartoon. Its auto-generated Dutch captions normally load by themselves; if you removed them, add them again from the Subtitles tab with “Fetch subtitles from YouTube”.',
+  'transcript.example': 'This is an example video. Its subtitles normally load by themselves; if you removed them, add them again from the Subtitles tab with “Fetch subtitles from YouTube”.',
 
   'translate.title': 'Translation helper (optional)',
   'translate.desc': 'Translate a loaded subtitle into another language with Claude. Text goes straight from your browser to Anthropic; Balonca has no server.',

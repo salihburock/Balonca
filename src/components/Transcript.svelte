@@ -7,7 +7,6 @@
   import { player } from '../lib/player/controller.svelte';
   import { alignTracks } from '../lib/player/cues';
   import { t } from '../lib/i18n/index.svelte';
-  import { EXAMPLE_VIDEO_ID } from '../lib/example';
 
   const primary = $derived(app.visibleTracks[0]);
   const others = $derived(app.visibleTracks.slice(1));
@@ -44,7 +43,7 @@
 {#if !primary}
   <div class="empty">
     <Mascot size={64} />
-    <p class="muted">{app.vid === EXAMPLE_VIDEO_ID ? t('transcript.example') : t('transcript.empty')}</p>
+    <p class="muted">{app.exampleId && app.vid === app.exampleId ? t('transcript.example') : t('transcript.empty')}</p>
   </div>
 {:else}
   <VirtualList

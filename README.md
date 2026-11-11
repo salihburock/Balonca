@@ -94,6 +94,21 @@ Things to know:
 - Keep `yt-dlp` current: YouTube changes break old versions, and distribution packages can lag behind. If the
   packaged one stops working, update it (`pipx upgrade yt-dlp`, or a newer package/standalone binary).
 
+## Example video (optional, installed per machine)
+The repository contains no example video or captions. If you want first-time visitors to land on a video that already
+has subtitles, install one on the machine that builds or serves the site. It uses the machine's own `yt-dlp`:
+
+```bash
+EXAMPLE_VIDEO="https://www.youtube.com/watch?v=VIDEO_ID" npm run setup:example   # before `npm run build`
+npm run setup:example -- --out dist/examples                                      # or into an already built site
+```
+
+It downloads the best original track (or `--langs nl-orig,tr` / `EXAMPLE_LANGS`), writes `examples/manifest.json`
+and the subtitle files, and does nothing if that video is already installed (`--force` downloads again). The files
+are git-ignored. On a visitor's first visit with no saved video the app opens the example and adds its subtitles once
+(deleting them keeps them deleted); without a manifest it simply starts with an empty player.
+Only use videos and captions you are allowed to use this way.
+
 ## Data and backups
 Words, settings and subtitles live in IndexedDB (database `balonca`). Use **My words → Backup** to export one
 JSON file and import it on another device (merge or replace). Data from the earlier single-file prototype
@@ -108,6 +123,7 @@ src/lib/storage/     IndexedDB, backup/restore, legacy migration  (unit-tested)
 src/lib/player/      YouTube wrapper, cue lookup/alignment, controller
 src/lib/translate/   Anthropic client + batch runner (isolated)   (unit-tested)
 src/lib/ytsubs/      client + language filter for the subtitle service (unit-tested)
+scripts/             per-machine example-video setup (unit-tested)
 server/              yt-dlp subtitle service (Node, no dependencies)  (unit-tested)
 src/lib/i18n/        tr.ts is the source, en.ts must cover every key
 src/components/      UI pieces      src/routes/   pages
@@ -120,6 +136,7 @@ It is a plain static folder, so any static host works (Cloudflare Pages, Netlify
 
 ### Own server (balonca.example.com)
 ```bash
+# optional, once per machine: EXAMPLE_VIDEO="<YouTube link>" npm run setup:example   (see "Example video")
 npm run build
 rsync -av --delete dist/ user@your-server:/var/www/balonca/        # create the folder first and make it writable for your user
 # once, with sudo on the server:

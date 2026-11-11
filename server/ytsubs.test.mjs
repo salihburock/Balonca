@@ -33,7 +33,7 @@ describe('parseTracks', () => {
 describe('validation', () => {
   it('video ids', () => {
     expect(ID_RE.test('abcdefghijk')).toBe(true);
-    for (const bad of ['', 'short', 'abcdefghijk1', 'QhAzVr2RuJ;', '../etc/pass', 'QhAzVr2RuJ '] ) expect(ID_RE.test(bad)).toBe(false);
+    for (const bad of ['', 'short', 'abcdefghijk1', 'abcdefghij;', '../etc/pass', 'abcdefghij '] ) expect(ID_RE.test(bad)).toBe(false);
   });
   it('language codes reject regex and path characters', () => {
     for (const ok of ['nl', 'nl-orig', 'zh-Hans', 'pt_BR']) expect(LANG_RE.test(ok)).toBe(true);

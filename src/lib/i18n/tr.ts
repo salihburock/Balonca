@@ -114,7 +114,7 @@ export const tr = {
   'ytsubs.err.ytdlp-missing': 'Sunucuda yt-dlp kurulu değil. Servisi çalıştıran kişi yt-dlp’yi kurmalı.',
   'ytsubs.err.failed': 'Altyazı alınamadı. Tekrar dene.',
   'ytsubs.err.cancelled': 'İptal edildi.',
-  'transcript.example': 'Bu bir örnek video: Flamanca bir çizgi film. Flamanca otomatik altyazısı normalde kendiliğinden yüklenir; sildiysen Altyazılar sekmesinden “YouTube’dan altyazı getir” ile tekrar ekleyebilirsin.',
+  'transcript.example': 'Bu bir örnek video. Altyazısı normalde kendiliğinden yüklenir; sildiysen Altyazılar sekmesinden “YouTube’dan altyazı getir” ile tekrar ekleyebilirsin.',
 
   'translate.title': 'Çeviri yardımcısı (isteğe bağlı)',
   'translate.desc': 'Yüklü bir altyazıyı Claude ile başka bir dile çevir. Metin tarayıcından doğrudan Anthropic’e gider; Balonca’nın sunucusu yoktur.',

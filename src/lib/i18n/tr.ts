@@ -111,6 +111,7 @@ export const tr = {
   'ytsubs.err.timeout': 'YouTube zamanında cevap vermedi. Tekrar dene.',
   'ytsubs.err.no-subs': 'Bu altyazı alınamadı.',
   'ytsubs.err.unreachable': 'Altyazı servisine ulaşılamıyor. Bu sürümde servis kapalı olabilir; altyazıyı yt-dlp ile indirip dosya olarak ekleyebilirsin (Yardım sayfası).',
+  'ytsubs.err.ytdlp-missing': 'Sunucuda yt-dlp kurulu değil. Servisi çalıştıran kişi yt-dlp’yi kurmalı.',
   'ytsubs.err.failed': 'Altyazı alınamadı. Tekrar dene.',
   'ytsubs.err.cancelled': 'İptal edildi.',
   'transcript.example': 'Bu bir örnek video: Flamanca bir çizgi film. Flamanca otomatik altyazısı normalde kendiliğinden yüklenir; sildiysen Altyazılar sekmesinden “YouTube’dan altyazı getir” ile tekrar ekleyebilirsin.',

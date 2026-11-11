@@ -29,6 +29,14 @@ export function runYtDlp(args, { bin = 'yt-dlp', timeoutMs = 60_000, maxBytes = 
   });
 }
 
+/** Version of the yt-dlp on this machine (the one found on PATH, or YTDLP_BIN), or null when it is not installed. */
+export async function checkYtDlp(run = runYtDlp, bin = 'yt-dlp') {
+  try {
+    const { stdout } = await run(['--version'], { bin, timeoutMs: 10_000 });
+    return stdout.trim() || null;
+  } catch { return null; }
+}
+
 export function classify(stderr) {
   const detail = stderr.trim().split('\n').filter((l) => /error/i.test(l)).pop()?.slice(0, 300) ?? stderr.slice(0, 300);
   // YouTube often refuses to serve its machine-translated captions to scripts; the original track is unaffected.
@@ -103,7 +111,7 @@ export function semaphore(limit, queueMax) {
 }
 
 export function createHandler({
-  run = runYtDlp, allowedOrigins = [], trustProxy = false, ratePerMinute = 30,
+  run = runYtDlp, ytdlpInstalled = true, allowedOrigins = [], trustProxy = false, ratePerMinute = 30,
   ttlMs = 10 * 60_000, now = Date.now,
 } = {}) {
   const limit = rateLimiter(ratePerMinute, now);
@@ -132,7 +140,7 @@ export function createHandler({
       if (req.method !== 'GET') throw new ApiError(405, 'method');
       const url = new URL(req.url ?? '/', 'http://x');
       const ip = (trustProxy && String(req.headers['x-forwarded-for'] ?? '').split(',')[0].trim()) || req.socket.remoteAddress || '?';
-      if (url.pathname === '/api/health') return send(200, { ok: true });
+      if (url.pathname === '/api/health') return send(200, { ok: true, ytdlp: ytdlpInstalled });
       if (!limit(ip)) throw new ApiError(429, 'rate-limit');
 
       const id = url.searchParams.get('v') ?? '';

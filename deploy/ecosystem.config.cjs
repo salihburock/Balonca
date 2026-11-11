@@ -7,7 +7,7 @@ module.exports = {
       PORT: 8787,
       HOST: '127.0.0.1',          // only nginx talks to it
       TRUST_PROXY: '1',           // nginx sets X-Forwarded-For
-      YTDLP_BIN: `${process.env.HOME}/.local/bin/yt-dlp`,
+      // yt-dlp: the one installed on this machine (on PATH) is used; set YTDLP_BIN only to override.
       RATE_PER_MINUTE: 30,
     },
     max_memory_restart: '300M',

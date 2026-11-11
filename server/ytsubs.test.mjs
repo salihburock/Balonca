@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { describe, expect, it } from 'vitest';
-import { ApiError, classify, createHandler, parseTracks, rateLimiter, semaphore, ID_RE, LANG_RE } from './lib.mjs';
+import { ApiError, checkYtDlp, classify, createHandler, parseTracks, rateLimiter, semaphore, ID_RE, LANG_RE } from './lib.mjs';
 
 const info = {
   id: 'abcdefghijk', title: 'Example video', duration: 420,
@@ -135,5 +135,29 @@ describe('HTTP API', () => {
     const no = await call(h, '/api/health', { origin: 'https://evil.example' });
     expect(ok.headers.get('access-control-allow-origin')).toBe('https://balonca.example.com');
     expect(no.headers.get('access-control-allow-origin')).toBeNull();
+  });
+});
+
+describe('system yt-dlp', () => {
+  it('reports the installed version', async () => {
+    const calls = [];
+    const run = async (args, opts) => { calls.push([args, opts]); return { stdout: '2026.08.19\n', stderr: '' }; };
+    expect(await checkYtDlp(run, '/usr/bin/yt-dlp')).toBe('2026.08.19');
+    expect(calls[0][0]).toEqual(['--version']);
+    expect(calls[0][1].bin).toBe('/usr/bin/yt-dlp');
+  });
+  it('returns null when it is not installed', async () => {
+    const run = async () => { throw new ApiError(500, 'ytdlp-missing'); };
+    expect(await checkYtDlp(run)).toBeNull();
+  });
+  it('really finds a binary on PATH (or reports none) without throwing', async () => {
+    const v = await checkYtDlp();
+    expect(v === null || typeof v === 'string').toBe(true);
+  });
+  it('health tells whether yt-dlp is available', async () => {
+    const yes = await call(createHandler({ ytdlpInstalled: true }), '/api/health');
+    const no = await call(createHandler({ ytdlpInstalled: false }), '/api/health');
+    expect(JSON.parse(yes.text)).toEqual({ ok: true, ytdlp: true });
+    expect(JSON.parse(no.text)).toEqual({ ok: true, ytdlp: false });
   });
 });

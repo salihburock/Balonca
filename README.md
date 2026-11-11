@@ -74,20 +74,25 @@ Turkish/English name, filterable, and add one with a click. Without the service 
 unchanged and the panel explains how to add a file instead. Set `VITE_SUBS_API=off` at build time to hide it.
 
 ```bash
-npm run api                    # http://127.0.0.1:8787, needs yt-dlp on PATH (or YTDLP_BIN=/path/to/yt-dlp)
+npm run api                    # http://127.0.0.1:8787, uses the yt-dlp installed on this machine
 npm run dev                    # the dev server proxies /api to it
 ```
 
 Endpoints: `GET /api/subs?v=ID` (list), `GET /api/sub?v=ID&lang=CODE&kind=auto|manual` (download),
 `GET /api/health`. Only YouTube video ids and plain language codes are accepted, `yt-dlp` is started without a
 shell, at most 2 run at once, results are cached for 10 minutes, and each client is limited to 30 requests per minute.
-Environment: `PORT`, `HOST`, `YTDLP_BIN`, `TRUST_PROXY=1` (behind nginx), `RATE_PER_MINUTE`, `ALLOWED_ORIGINS`.
+The service uses **the `yt-dlp` of the operating system it runs on** (whatever is on `PATH`; it logs the version at
+startup and `/api/health` reports whether it was found). `YTDLP_BIN=/path/to/yt-dlp` is only an override.
+Install it with your system's package manager (`sudo apt install yt-dlp`, `brew install yt-dlp`, `pacman -S yt-dlp`) or
+`pipx install yt-dlp`.
+Environment: `PORT`, `HOST`, `YTDLP_BIN` (optional), `TRUST_PROXY=1` (behind nginx), `RATE_PER_MINUTE`, `ALLOWED_ORIGINS`.
 
 Things to know:
 - YouTube answers **HTTP 429 for its machine-translated captions** when asked by scripts, so those often fail while the
   original track (`nl-orig`) works. The app says so and suggests the translation helper instead.
 - Servers in data centres are sometimes asked to "sign in to confirm you're not a bot". The app reports that too.
-- Keep `yt-dlp` current (`yt-dlp -U`); YouTube changes break old versions.
+- Keep `yt-dlp` current: YouTube changes break old versions, and distribution packages can lag behind. If the
+  packaged one stops working, update it (`pipx upgrade yt-dlp`, or a newer package/standalone binary).
 
 ## Data and backups
 Words, settings and subtitles live in IndexedDB (database `balonca`). Use **My words → Backup** to export one
@@ -123,9 +128,8 @@ sudo ln -s /etc/nginx/sites-available/balonca /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d balonca.example.com
 ```
-Subtitle service on the same server (no root needed):
+Subtitle service on the same server (install `yt-dlp` once with your package manager, then):
 ```bash
-ssh user@your-server 'mkdir -p ~/.local/bin ~/balonca-api && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp && chmod +x ~/.local/bin/yt-dlp'
 rsync -av server/ user@your-server:~/balonca-api/server/ && scp deploy/ecosystem.config.cjs user@your-server:~/balonca-api/
 ssh user@your-server 'cd ~/balonca-api && pm2 start ecosystem.config.cjs && pm2 save'
 ```
@@ -142,4 +146,4 @@ features (and YouTube embedding behaviour) are more reliable on a secure origin.
 Use this tool for personal language learning and respect creators' rights.
 
 ## License
-Placeholder: see `LICENSE`.
+MIT, see `LICENSE`.
